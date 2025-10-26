@@ -1,0 +1,143 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Category;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
+class AdminCategoryController extends Controller
+{
+    /**
+     * Display a listing of all categories (Admin only)
+     */
+    public function index()
+    {
+        $categories = Category::with(['sousCategories', 'repas'])->get();
+        return response()->json([
+            'success' => true,
+            'data' => $categories
+        ]);
+    }
+
+    /**
+     * Store a newly created category (Admin only)
+     */
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255|unique:categories'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $category = Category::create($request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Category created successfully',
+            'data' => $category
+        ], 201);
+    }
+
+    /**
+     * Display the specified category (Admin only)
+     */
+    public function show(string $id)
+    {
+        $category = Category::with(['sousCategories', 'repas'])->find($id);
+        
+        if (!$category) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Category not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $category
+        ]);
+    }
+
+    /**
+     * Update the specified category (Admin only)
+     */
+    public function update(Request $request, string $id)
+    {
+        $category = Category::find($id);
+        
+        if (!$category) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Category not found'
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'sometimes|string|max:255|unique:categories,name,' . $id
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $category->update($request->only(['name']));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Category updated successfully',
+            'data' => $category
+        ]);
+    }
+
+    /**
+     * Remove the specified category (Admin only)
+     */
+    public function destroy(string $id)
+    {
+        $category = Category::find($id);
+        
+        if (!$category) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Category not found'
+            ], 404);
+        }
+
+        $category->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Category deleted successfully'
+        ]);
+    }
+
+    /**
+     * Get category statistics (Admin only)
+     */
+    public function getStats()
+    {
+        $totalCategories = Category::count();
+        $categoriesWithRepas = Category::has('repas')->count();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'total_categories' => $totalCategories,
+                'categories_with_repas' => $categoriesWithRepas
+            ]
+        ]);
+    }
+}
