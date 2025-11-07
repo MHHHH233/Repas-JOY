@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminRepasController;
 use App\Http\Controllers\Admin\AdminCommandeController;
 use App\Http\Controllers\Admin\AdminReviewController;
+use App\Http\Controllers\Admin\AdminLandingSectionController;
+use App\Http\Controllers\Admin\AdminSousCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,6 +70,26 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/{id}', [AdminReviewController::class, 'update']);
         Route::delete('/{id}', [AdminReviewController::class, 'destroy']);
         Route::get('/stats/overview', [AdminReviewController::class, 'getStats']);
+    });
+
+    // Admin LandingSection routes
+    Route::prefix('admin/landing-sections')->group(function () {
+        Route::get('/', [AdminLandingSectionController::class, 'index']);
+        Route::post('/', [AdminLandingSectionController::class, 'store']);
+        Route::get('/{id}', [AdminLandingSectionController::class, 'show']);
+        Route::put('/{id}', [AdminLandingSectionController::class, 'update']);
+        Route::delete('/{id}', [AdminLandingSectionController::class, 'destroy']);
+        Route::get('/stats/overview', [AdminLandingSectionController::class, 'getStats']);
+    });
+
+    // Admin SousCategory routes
+    Route::prefix('admin/sous-categories')->group(function () {
+        Route::get('/', [AdminSousCategoryController::class, 'index']);
+        Route::post('/', [AdminSousCategoryController::class, 'store']);
+        Route::get('/{id}', [AdminSousCategoryController::class, 'show']);
+        Route::put('/{id}', [AdminSousCategoryController::class, 'update']);
+        Route::delete('/{id}', [AdminSousCategoryController::class, 'destroy']);
+        Route::get('/stats/overview', [AdminSousCategoryController::class, 'getStats']);
     });
 
     // Admin Dashboard routes

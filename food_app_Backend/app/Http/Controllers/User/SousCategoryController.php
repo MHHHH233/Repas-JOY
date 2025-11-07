@@ -1,34 +1,36 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
+use App\Models\SousCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class AdminCategoryController extends Controller
+class SousCategoryController extends Controller
 {
     /**
-     * Display a listing of all categories (Admin only)
+     * Display a listing of sous-categories.
      */
     public function index(Request $request)
     {
         $perPage = (int) $request->query('per_page', 10);
-        $categories = Category::with(['sousCategories', 'repas'])->paginate($perPage);
+        $sousCategories = SousCategory::paginate($perPage);
         return response()->json([
             'success' => true,
-            'data' => $categories
+            'data' => $sousCategories
         ]);
     }
 
     /**
-     * Store a newly created category (Admin only)
+     * Store a newly created sous-category.
      */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:categories'
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'id_category' => 'required|exists:categories,id'
         ]);
 
         if ($validator->fails()) {
@@ -39,51 +41,53 @@ class AdminCategoryController extends Controller
             ], 422);
         }
 
-        $category = Category::create($request->all());
+        $sousCategory = SousCategory::create($request->all());
 
         return response()->json([
             'success' => true,
-            'message' => 'Category created successfully',
-            'data' => $category
+            'message' => 'Sous-category created successfully',
+            'data' => $sousCategory
         ], 201);
     }
 
     /**
-     * Display the specified category (Admin only)
+     * Display the specified sous-category.
      */
     public function show(string $id)
     {
-        $category = Category::with(['sousCategories', 'repas'])->find($id);
-        
-        if (!$category) {
+        $sousCategory = SousCategory::find($id);
+
+        if (!$sousCategory) {
             return response()->json([
                 'success' => false,
-                'message' => 'Category not found'
+                'message' => 'Sous-category not found'
             ], 404);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $category
+            'data' => $sousCategory
         ]);
     }
 
     /**
-     * Update the specified category (Admin only)
+     * Update the specified sous-category.
      */
     public function update(Request $request, string $id)
     {
-        $category = Category::find($id);
-        
-        if (!$category) {
+        $sousCategory = SousCategory::find($id);
+
+        if (!$sousCategory) {
             return response()->json([
                 'success' => false,
-                'message' => 'Category not found'
+                'message' => 'Sous-category not found'
             ], 404);
         }
 
         $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:255|unique:categories,name,' . $id
+            'name' => 'sometimes|string|max:255',
+            'description' => 'sometimes|nullable|string',
+            'id_category' => 'sometimes|exists:categories,id'
         ]);
 
         if ($validator->fails()) {
@@ -94,51 +98,49 @@ class AdminCategoryController extends Controller
             ], 422);
         }
 
-        $category->update($request->only(['name']));
+        $sousCategory->update($request->all());
 
         return response()->json([
             'success' => true,
-            'message' => 'Category updated successfully',
-            'data' => $category
+            'message' => 'Sous-category updated successfully',
+            'data' => $sousCategory
         ]);
     }
 
     /**
-     * Remove the specified category (Admin only)
+     * Remove the specified sous-category.
      */
     public function destroy(string $id)
     {
-        $category = Category::find($id);
-        
-        if (!$category) {
+        $sousCategory = SousCategory::find($id);
+
+        if (!$sousCategory) {
             return response()->json([
                 'success' => false,
-                'message' => 'Category not found'
+                'message' => 'Sous-category not found'
             ], 404);
         }
 
-        $category->delete();
+        $sousCategory->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Category deleted successfully'
+            'message' => 'Sous-category deleted successfully'
         ]);
     }
 
     /**
-     * Get category statistics (Admin only)
+     * Get sous-categories by category id.
      */
-    public function getStats()
+    public function getByCategory(Request $request, string $categoryId)
     {
-        $totalCategories = Category::count();
-        $categoriesWithRepas = Category::has('repas')->count();
-
+        $perPage = (int) $request->query('per_page', 10);
+        $sousCategories = SousCategory::where('id_category', $categoryId)->paginate($perPage);
         return response()->json([
             'success' => true,
-            'data' => [
-                'total_categories' => $totalCategories,
-                'categories_with_repas' => $categoriesWithRepas
-            ]
+            'data' => $sousCategories
         ]);
     }
 }
+
+

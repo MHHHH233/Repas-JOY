@@ -13,9 +13,10 @@ class AdminUserController extends Controller
     /**
      * Display a listing of all users (Admin only)
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('commandes')->get();
+        $perPage = (int) $request->query('per_page', 10);
+        $users = User::with('commandes')->paginate($perPage);
         return response()->json([
             'success' => true,
             'data' => $users

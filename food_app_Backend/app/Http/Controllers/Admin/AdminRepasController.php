@@ -13,9 +13,10 @@ class AdminRepasController extends Controller
     /**
      * Display a listing of all repas (Admin only)
      */
-    public function index()
+    public function index(Request $request)
     {
-        $repas = Repas::with('category')->get();
+        $perPage = (int) $request->query('per_page', 10);
+        $repas = Repas::with('category')->paginate($perPage);
         return response()->json([
             'success' => true,
             'data' => $repas
