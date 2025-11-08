@@ -12,9 +12,10 @@ class AdminCommandeController extends Controller
     /**
      * Display a listing of all commandes (Admin only)
      */
-    public function index()
+    public function index(Request $request)
     {
-        $commandes = Commande::with(['user', 'repas'])->get();
+        $perPage = (int) $request->query('per_page', 10);
+        $commandes = Commande::with(['user', 'repas'])->paginate($perPage);
         return response()->json([
             'success' => true,
             'data' => $commandes

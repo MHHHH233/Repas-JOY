@@ -14,9 +14,10 @@ class CommandeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $commandes = Commande::with(['user', 'repas'])->get();
+        $perPage = (int) $request->query('per_page', 10);
+        $commandes = Commande::with(['user', 'repas'])->paginate($perPage);
         return response()->json([
             'success' => true,
             'data' => $commandes
@@ -153,11 +154,12 @@ class CommandeController extends Controller
     /**
      * Get commandes by user
      */
-    public function getByUser(string $userId)
+    public function getByUser(Request $request, string $userId)
     {
+        $perPage = (int) $request->query('per_page', 10);
         $commandes = Commande::with(['user', 'repas'])
             ->where('id_user', $userId)
-            ->get();
+            ->paginate($perPage);
 
         return response()->json([
             'success' => true,

@@ -13,9 +13,10 @@ class RepasController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $repas = Repas::with('category')->get();
+        $perPage = (int) $request->query('per_page', 10);
+        $repas = Repas::with('category')->paginate($perPage);
         return response()->json([
             'success' => true,
             'data' => $repas
@@ -138,12 +139,13 @@ class RepasController extends Controller
     /**
      * Get repas by category
      */
-    public function getByCategory(string $categoryId)
+    public function getByCategory(Request $request, string $categoryId)
     {
+        $perPage = (int) $request->query('per_page', 10);
         $repas = Repas::with('category')
             ->where('id_category', $categoryId)
             ->where('onView', true)
-            ->get();
+            ->paginate($perPage);
 
         return response()->json([
             'success' => true,

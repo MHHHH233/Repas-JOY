@@ -3,34 +3,34 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Review;
+use App\Models\SousCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class AdminReviewController extends Controller
+class AdminSousCategoryController extends Controller
 {
     /**
-     * Display a listing of all reviews (Admin only)
+     * Display a listing of sous-categories (Admin only)
      */
     public function index(Request $request)
     {
         $perPage = (int) $request->query('per_page', 10);
-        $reviews = Review::paginate($perPage);
+        $sousCategories = SousCategory::paginate($perPage);
         return response()->json([
             'success' => true,
-            'data' => $reviews
+            'data' => $sousCategories
         ]);
     }
 
     /**
-     * Store a newly created review (Admin only)
+     * Store a newly created sous-category (Admin only)
      */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'nom_user' => 'required|string|max:255',
-            'des' => 'required|string',
-            'stars' => 'required|integer|min:1|max:5'
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'id_category' => 'required|exists:categories,id'
         ]);
 
         if ($validator->fails()) {
@@ -41,53 +41,53 @@ class AdminReviewController extends Controller
             ], 422);
         }
 
-        $review = Review::create($request->all());
+        $sousCategory = SousCategory::create($request->all());
 
         return response()->json([
             'success' => true,
-            'message' => 'Review created successfully',
-            'data' => $review
+            'message' => 'Sous-category created successfully',
+            'data' => $sousCategory
         ], 201);
     }
 
     /**
-     * Display the specified review (Admin only)
+     * Display the specified sous-category (Admin only)
      */
     public function show(string $id)
     {
-        $review = Review::find($id);
-        
-        if (!$review) {
+        $sousCategory = SousCategory::find($id);
+
+        if (!$sousCategory) {
             return response()->json([
                 'success' => false,
-                'message' => 'Review not found'
+                'message' => 'Sous-category not found'
             ], 404);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $review
+            'data' => $sousCategory
         ]);
     }
 
     /**
-     * Update the specified review (Admin only)
+     * Update the specified sous-category (Admin only)
      */
     public function update(Request $request, string $id)
     {
-        $review = Review::find($id);
-        
-        if (!$review) {
+        $sousCategory = SousCategory::find($id);
+
+        if (!$sousCategory) {
             return response()->json([
                 'success' => false,
-                'message' => 'Review not found'
+                'message' => 'Sous-category not found'
             ], 404);
         }
 
         $validator = Validator::make($request->all(), [
-            'nom_user' => 'sometimes|string|max:255',
-            'des' => 'sometimes|string',
-            'stars' => 'sometimes|integer|min:1|max:5'
+            'name' => 'sometimes|string|max:255',
+            'description' => 'sometimes|nullable|string',
+            'id_category' => 'sometimes|exists:categories,id'
         ]);
 
         if ($validator->fails()) {
@@ -98,55 +98,51 @@ class AdminReviewController extends Controller
             ], 422);
         }
 
-        $review->update($request->all());
+        $sousCategory->update($request->all());
 
         return response()->json([
             'success' => true,
-            'message' => 'Review updated successfully',
-            'data' => $review
+            'message' => 'Sous-category updated successfully',
+            'data' => $sousCategory
         ]);
     }
 
     /**
-     * Remove the specified review (Admin only)
+     * Remove the specified sous-category (Admin only)
      */
     public function destroy(string $id)
     {
-        $review = Review::find($id);
-        
-        if (!$review) {
+        $sousCategory = SousCategory::find($id);
+
+        if (!$sousCategory) {
             return response()->json([
                 'success' => false,
-                'message' => 'Review not found'
+                'message' => 'Sous-category not found'
             ], 404);
         }
 
-        $review->delete();
+        $sousCategory->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Review deleted successfully'
+            'message' => 'Sous-category deleted successfully'
         ]);
     }
 
     /**
-     * Get review statistics (Admin only)
+     * Get sous-category statistics (Admin only)
      */
     public function getStats()
     {
-        $totalReviews = Review::count();
-        $averageRating = Review::avg('stars');
-        $fiveStarReviews = Review::where('stars', 5)->count();
-        $oneStarReviews = Review::where('stars', 1)->count();
+        $total = SousCategory::count();
 
         return response()->json([
             'success' => true,
             'data' => [
-                'total_reviews' => $totalReviews,
-                'average_rating' => round($averageRating, 2),
-                'five_star_reviews' => $fiveStarReviews,
-                'one_star_reviews' => $oneStarReviews
+                'total_sous_categories' => $total
             ]
         ]);
     }
 }
+
+

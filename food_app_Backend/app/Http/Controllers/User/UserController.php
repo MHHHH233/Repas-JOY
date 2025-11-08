@@ -13,9 +13,10 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
+        $perPage = (int) $request->query('per_page', 10);
+        $users = User::paginate($perPage);
         return response()->json([
             'success' => true,
             'data' => $users

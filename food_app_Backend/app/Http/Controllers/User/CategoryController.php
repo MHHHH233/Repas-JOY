@@ -12,9 +12,10 @@ class CategoryController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::with('sousCategories')->get();
+        $perPage = (int) $request->query('per_page', 10);
+        $categories = Category::with('sousCategories')->paginate($perPage);
         return response()->json([
             'success' => true,
             'data' => $categories

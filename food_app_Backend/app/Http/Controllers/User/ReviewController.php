@@ -12,9 +12,10 @@ class ReviewController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $reviews = Review::all();
+        $perPage = (int) $request->query('per_page', 10);
+        $reviews = Review::paginate($perPage);
         return response()->json([
             'success' => true,
             'data' => $reviews

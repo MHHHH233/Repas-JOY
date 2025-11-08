@@ -6,6 +6,8 @@ use App\Http\Controllers\User\CategoryController;
 use App\Http\Controllers\User\RepasController;
 use App\Http\Controllers\User\CommandeController;
 use App\Http\Controllers\User\ReviewController;
+use App\Http\Controllers\User\LandingSectionController;
+use App\Http\Controllers\User\SousCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +39,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/{id}', [CategoryController::class, 'destroy']);
     });
 
+    // SousCategory routes
+    Route::prefix('sous-categories')->group(function () {
+        Route::get('/', [SousCategoryController::class, 'index']);
+        Route::post('/', [SousCategoryController::class, 'store']);
+        Route::get('/{id}', [SousCategoryController::class, 'show']);
+        Route::put('/{id}', [SousCategoryController::class, 'update']);
+        Route::delete('/{id}', [SousCategoryController::class, 'destroy']);
+        Route::get('/category/{categoryId}', [SousCategoryController::class, 'getByCategory']);
+    });
+
     // Repas routes
     Route::prefix('repas')->group(function () {
         Route::get('/', [RepasController::class, 'index']);
@@ -64,5 +76,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{id}', [ReviewController::class, 'show']);
         Route::put('/{id}', [ReviewController::class, 'update']);
         Route::delete('/{id}', [ReviewController::class, 'destroy']);
+    });
+
+    // LandingSection routes
+    Route::prefix('landing-sections')->group(function () {
+        Route::get('/', [LandingSectionController::class, 'index']);
+        Route::post('/', [LandingSectionController::class, 'store']);
+        Route::get('/active', [LandingSectionController::class, 'active']);
+        Route::get('/{id}', [LandingSectionController::class, 'show']);
+        Route::put('/{id}', [LandingSectionController::class, 'update']);
+        Route::delete('/{id}', [LandingSectionController::class, 'destroy']);
     });
 });
