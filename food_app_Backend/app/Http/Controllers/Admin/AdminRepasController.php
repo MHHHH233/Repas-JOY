@@ -34,7 +34,9 @@ class AdminRepasController extends Controller
             'vegan' => 'required|boolean',
             'onView' => 'required|boolean',
             'qte' => 'required|integer|min:0',
-            'id_category' => 'required|exists:categories,id'
+            'id_category' => 'required|exists:categories,id',
+            'imgs_urls' => 'nullable|array',
+            'imgs_urls.*' => 'url'
         ]);
 
         if ($validator->fails()) {
@@ -94,7 +96,9 @@ class AdminRepasController extends Controller
             'vegan' => 'sometimes|boolean',
             'onView' => 'sometimes|boolean',
             'qte' => 'sometimes|integer|min:0',
-            'id_category' => 'sometimes|exists:categories,id'
+            'id_category' => 'sometimes|exists:categories,id',
+            'imgs_urls' => 'sometimes|array',
+            'imgs_urls.*' => 'url'
         ]);
 
         if ($validator->fails()) {

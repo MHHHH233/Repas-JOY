@@ -1,0 +1,2911 @@
+================================================================================
+                    FOOD APP BACKEND - API TESTING DOCUMENTATION
+================================================================================
+
+BASE URL: http://localhost:8000/api (or your domain)
+
+AUTHENTICATION: Bearer Token (Sanctum)
+Headers: 
+  - Authorization: Bearer {token}
+  - Accept: application/json
+  - Content-Type: application/json
+
+================================================================================
+                        1. AUTHENTICATION ENDPOINTS
+================================================================================
+
+1.1. REGISTER USER
+----------------------------------------
+Method: POST
+URL: /api/register
+Auth: Not Required
+
+Request Body:
+{
+  "username": "johndoe",
+  "email": "john@example.com",
+  "password": "password123",
+  "password_confirmation": "password123",
+  "address": "123 Main St",
+  "date_naissance": "1990-01-01",
+  "role": "user"  // optional: "user" or "admin", defaults to "user"
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "user": {
+      "id": 1,
+      "username": "johndoe",
+      "email": "john@example.com",
+      "address": "123 Main St",
+      "date_naissance": "1990-01-01",
+      "role": "user",
+      "created_at": "2024-01-01T00:00:00.000000Z",
+      "updated_at": "2024-01-01T00:00:00.000000Z"
+    },
+    "token": "1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "token_type": "Bearer"
+  }
+}
+
+Error Response (422):
+{
+  "success": false,
+  "message": "Validation errors",
+  "errors": {
+    "email": ["The email has already been taken."],
+    "password": ["The password confirmation does not match."]
+  }
+}
+
+----------------------------------------
+
+1.2. LOGIN USER
+----------------------------------------
+Method: POST
+URL: /api/login
+Auth: Not Required
+
+Request Body:
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "user": {
+      "id": 1,
+      "username": "johndoe",
+      "email": "john@example.com",
+      "address": "123 Main St",
+      "date_naissance": "1990-01-01",
+      "role": "user",
+      "created_at": "2024-01-01T00:00:00.000000Z",
+      "updated_at": "2024-01-01T00:00:00.000000Z"
+    },
+    "token": "1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "token_type": "Bearer"
+  }
+}
+
+Error Response (401):
+{
+  "success": false,
+  "message": "Invalid credentials"
+}
+
+----------------------------------------
+
+1.3. LOGOUT USER
+----------------------------------------
+Method: POST
+URL: /api/logout
+Auth: Required (Bearer Token)
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Logout successful"
+}
+
+----------------------------------------
+
+1.4. GET USER PROFILE
+----------------------------------------
+Method: GET
+URL: /api/profile
+Auth: Required (Bearer Token)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "username": "johndoe",
+    "email": "john@example.com",
+    "address": "123 Main St",
+    "date_naissance": "1990-01-01",
+    "role": "user",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+1.5. UPDATE USER PROFILE
+----------------------------------------
+Method: PUT
+URL: /api/profile
+Auth: Required (Bearer Token)
+
+Request Body (all fields optional):
+{
+  "username": "johndoe_updated",
+  "email": "john_updated@example.com",
+  "address": "456 New St",
+  "date_naissance": "1990-01-01"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Profile updated successfully",
+  "data": {
+    "id": 1,
+    "username": "johndoe_updated",
+    "email": "john_updated@example.com",
+    "address": "456 New St",
+    "date_naissance": "1990-01-01",
+    "role": "user",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+1.6. CHANGE PASSWORD
+----------------------------------------
+Method: POST
+URL: /api/change-password
+Auth: Required (Bearer Token)
+
+Request Body:
+{
+  "current_password": "oldpassword123",
+  "new_password": "newpassword123",
+  "new_password_confirmation": "newpassword123"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Password changed successfully"
+}
+
+Error Response (400):
+{
+  "success": false,
+  "message": "Current password is incorrect"
+}
+
+----------------------------------------
+
+1.7. REFRESH TOKEN
+----------------------------------------
+Method: POST
+URL: /api/refresh
+Auth: Required (Bearer Token)
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Token refreshed successfully",
+  "data": {
+    "token": "2|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "token_type": "Bearer"
+  }
+}
+
+----------------------------------------
+
+1.8. TEST API
+----------------------------------------
+Method: GET
+URL: /api/test
+Auth: Not Required
+
+Success Response (200):
+{
+  "success": true,
+  "message": "API is working!",
+  "timestamp": "2024-01-01T00:00:00.000000Z"
+}
+
+================================================================================
+                        2. ADMIN ENDPOINTS
+================================================================================
+
+NOTE: All admin endpoints require authentication (Bearer Token)
+Base URL: /api/admin
+
+----------------------------------------
+
+2.1. ADMIN USERS MANAGEMENT
+----------------------------------------
+
+2.1.1. GET ALL USERS (Paginated)
+Method: GET
+URL: /api/admin/users
+Query Parameters:
+  - per_page: number (default: 10) - Items per page
+
+Example: /api/admin/users?per_page=20
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "username": "johndoe",
+        "email": "john@example.com",
+        "address": "123 Main St",
+        "date_naissance": "1990-01-01",
+        "role": "user",
+        "commandes": [],
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "first_page_url": "http://localhost:8000/api/admin/users?page=1",
+    "from": 1,
+    "last_page": 1,
+    "last_page_url": "http://localhost:8000/api/admin/users?page=1",
+    "links": [...],
+    "next_page_url": null,
+    "path": "http://localhost:8000/api/admin/users",
+    "per_page": 10,
+    "prev_page_url": null,
+    "to": 1,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+2.1.2. CREATE USER
+Method: POST
+URL: /api/admin/users
+
+Request Body:
+{
+  "username": "newuser",
+  "email": "newuser@example.com",
+  "password": "password123",
+  "address": "123 Main St",
+  "date_naissance": "1990-01-01",
+  "role": "user"
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "User created successfully",
+  "data": {
+    "id": 2,
+    "username": "newuser",
+    "email": "newuser@example.com",
+    "address": "123 Main St",
+    "date_naissance": "1990-01-01",
+    "role": "user",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.1.3. GET USER BY ID
+Method: GET
+URL: /api/admin/users/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "username": "johndoe",
+    "email": "john@example.com",
+    "address": "123 Main St",
+    "date_naissance": "1990-01-01",
+    "role": "user",
+    "commandes": [],
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+Error Response (404):
+{
+  "success": false,
+  "message": "User not found"
+}
+
+----------------------------------------
+
+2.1.4. UPDATE USER
+Method: PUT
+URL: /api/admin/users/{id}
+
+Request Body (all fields optional):
+{
+  "username": "updateduser",
+  "email": "updated@example.com",
+  "password": "newpassword123",
+  "address": "456 New St",
+  "date_naissance": "1990-01-01",
+  "role": "admin"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "User updated successfully",
+  "data": {
+    "id": 1,
+    "username": "updateduser",
+    "email": "updated@example.com",
+    "address": "456 New St",
+    "date_naissance": "1990-01-01",
+    "role": "admin",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.1.5. DELETE USER
+Method: DELETE
+URL: /api/admin/users/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "User deleted successfully"
+}
+
+----------------------------------------
+
+2.1.6. GET USER STATISTICS
+Method: GET
+URL: /api/admin/users/stats/overview
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "total_users": 50,
+    "admin_users": 5,
+    "regular_users": 45
+  }
+}
+
+----------------------------------------
+
+2.2. ADMIN CATEGORIES MANAGEMENT
+----------------------------------------
+
+2.2.1. GET ALL CATEGORIES (Paginated)
+Method: GET
+URL: /api/admin/categories
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "name": "Main Course",
+        "sousCategories": [],
+        "repas": [],
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "first_page_url": "...",
+    "from": 1,
+    "last_page": 1,
+    "last_page_url": "...",
+    "links": [...],
+    "next_page_url": null,
+    "path": "...",
+    "per_page": 10,
+    "prev_page_url": null,
+    "to": 1,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+2.2.2. CREATE CATEGORY
+Method: POST
+URL: /api/admin/categories
+
+Request Body:
+{
+  "name": "Desserts"
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Category created successfully",
+  "data": {
+    "id": 2,
+    "name": "Desserts",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.2.3. GET CATEGORY BY ID
+Method: GET
+URL: /api/admin/categories/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "Main Course",
+    "sousCategories": [],
+    "repas": [],
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.2.4. UPDATE CATEGORY
+Method: PUT
+URL: /api/admin/categories/{id}
+
+Request Body:
+{
+  "name": "Updated Category Name"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Category updated successfully",
+  "data": {
+    "id": 1,
+    "name": "Updated Category Name",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.2.5. DELETE CATEGORY
+Method: DELETE
+URL: /api/admin/categories/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Category deleted successfully"
+}
+
+----------------------------------------
+
+2.2.6. GET CATEGORY STATISTICS
+Method: GET
+URL: /api/admin/categories/stats/overview
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "total_categories": 10,
+    "categories_with_repas": 8
+  }
+}
+
+----------------------------------------
+
+2.3. ADMIN REPAS MANAGEMENT
+----------------------------------------
+
+2.3.1. GET ALL REPAS (Paginated)
+Method: GET
+URL: /api/admin/repas
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "name": "Grilled Chicken",
+        "description": "Delicious grilled chicken",
+        "vegan": false,
+        "onView": true,
+        "qte": 50,
+        "id_category": 1,
+        "imgs_urls": [
+          "https://example.com/image1.jpg",
+          "https://example.com/image2.jpg"
+        ],
+        "category": {
+          "id": 1,
+          "name": "Main Course"
+        },
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "first_page_url": "...",
+    "from": 1,
+    "last_page": 1,
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+2.3.2. CREATE REPAS
+Method: POST
+URL: /api/admin/repas
+
+Request Body:
+{
+  "name": "Vegetarian Pizza",
+  "description": "Fresh vegetables on pizza",
+  "vegan": true,
+  "onView": true,
+  "qte": 30,
+  "id_category": 1,
+  "imgs_urls": [
+    "https://example.com/pizza1.jpg",
+    "https://example.com/pizza2.jpg"
+  ]
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Repas created successfully",
+  "data": {
+    "id": 2,
+    "name": "Vegetarian Pizza",
+    "description": "Fresh vegetables on pizza",
+    "vegan": true,
+    "onView": true,
+    "qte": 30,
+    "id_category": 1,
+    "imgs_urls": [
+      "https://example.com/pizza1.jpg",
+      "https://example.com/pizza2.jpg"
+    ],
+    "category": {
+      "id": 1,
+      "name": "Main Course"
+    },
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.3.3. GET REPAS BY ID
+Method: GET
+URL: /api/admin/repas/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "Grilled Chicken",
+    "description": "Delicious grilled chicken",
+    "vegan": false,
+    "onView": true,
+    "qte": 50,
+    "id_category": 1,
+    "imgs_urls": [
+      "https://example.com/image1.jpg",
+      "https://example.com/image2.jpg"
+    ],
+    "category": {...},
+    "commandes": [],
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.3.4. UPDATE REPAS
+Method: PUT
+URL: /api/admin/repas/{id}
+
+Request Body (all fields optional):
+{
+  "name": "Updated Repas Name",
+  "description": "Updated description",
+  "vegan": false,
+  "onView": true,
+  "qte": 40,
+  "id_category": 2,
+  "imgs_urls": [
+    "https://example.com/updated1.jpg",
+    "https://example.com/updated2.jpg"
+  ]
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Repas updated successfully",
+  "data": {
+    "id": 1,
+    "name": "Updated Repas Name",
+    "description": "Updated description",
+    "vegan": false,
+    "onView": true,
+    "qte": 40,
+    "id_category": 2,
+    "imgs_urls": [
+      "https://example.com/updated1.jpg",
+      "https://example.com/updated2.jpg"
+    ],
+    "category": {...},
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.3.5. DELETE REPAS
+Method: DELETE
+URL: /api/admin/repas/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Repas deleted successfully"
+}
+
+----------------------------------------
+
+2.3.6. TOGGLE REPAS VISIBILITY
+Method: POST
+URL: /api/admin/repas/{id}/toggle-visibility
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Repas visibility updated successfully",
+  "data": {
+    "id": 1,
+    "name": "Grilled Chicken",
+    "onView": false,
+    "imgs_urls": [
+      "https://example.com/image1.jpg",
+      "https://example.com/image2.jpg"
+    ],
+    ...
+  }
+}
+
+----------------------------------------
+
+2.3.7. GET REPAS STATISTICS
+Method: GET
+URL: /api/admin/repas/stats/overview
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "total_repas": 100,
+    "available_repas": 80,
+    "vegan_repas": 30,
+    "low_stock_repas": 5
+  }
+}
+
+----------------------------------------
+
+2.4. ADMIN COMMANDES MANAGEMENT
+----------------------------------------
+
+2.4.1. GET ALL COMMANDES (Paginated)
+Method: GET
+URL: /api/admin/commandes
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "id_user": 1,
+        "id_repas": 1,
+        "address": "123 Main St",
+        "name": "John Doe",
+        "user": {
+          "id": 1,
+          "username": "johndoe",
+          "email": "john@example.com"
+        },
+        "repas": {
+          "id": 1,
+          "name": "Grilled Chicken"
+        },
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "first_page_url": "...",
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+2.4.2. CREATE COMMANDE
+Method: POST
+URL: /api/admin/commandes
+
+Request Body:
+{
+  "id_user": 1,
+  "id_repas": 1,
+  "address": "123 Main St",
+  "name": "John Doe"
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Commande created successfully",
+  "data": {
+    "id": 2,
+    "id_user": 1,
+    "id_repas": 1,
+    "address": "123 Main St",
+    "name": "John Doe",
+    "user": {...},
+    "repas": {...},
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.4.3. GET COMMANDE BY ID
+Method: GET
+URL: /api/admin/commandes/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "id_user": 1,
+    "id_repas": 1,
+    "address": "123 Main St",
+    "name": "John Doe",
+    "user": {...},
+    "repas": {...},
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.4.4. UPDATE COMMANDE
+Method: PUT
+URL: /api/admin/commandes/{id}
+
+Request Body (all fields optional):
+{
+  "id_user": 2,
+  "id_repas": 2,
+  "address": "456 New St",
+  "name": "Jane Doe"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Commande updated successfully",
+  "data": {
+    "id": 1,
+    "id_user": 2,
+    "id_repas": 2,
+    "address": "456 New St",
+    "name": "Jane Doe",
+    "user": {...},
+    "repas": {...},
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.4.5. DELETE COMMANDE
+Method: DELETE
+URL: /api/admin/commandes/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Commande deleted successfully"
+}
+
+----------------------------------------
+
+2.4.6. GET COMMANDE STATISTICS
+Method: GET
+URL: /api/admin/commandes/stats/overview
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "total_commandes": 500,
+    "commandes_today": 20,
+    "commandes_this_week": 150,
+    "commandes_this_month": 450
+  }
+}
+
+----------------------------------------
+
+2.5. ADMIN REVIEWS MANAGEMENT
+----------------------------------------
+
+2.5.1. GET ALL REVIEWS (Paginated)
+Method: GET
+URL: /api/admin/reviews
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "nom_user": "John Doe",
+        "des": "Great food!",
+        "stars": 5,
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+2.5.2. CREATE REVIEW
+Method: POST
+URL: /api/admin/reviews
+
+Request Body:
+{
+  "nom_user": "Jane Doe",
+  "des": "Excellent service and food quality",
+  "stars": 5
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Review created successfully",
+  "data": {
+    "id": 2,
+    "nom_user": "Jane Doe",
+    "des": "Excellent service and food quality",
+    "stars": 5,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.5.3. GET REVIEW BY ID
+Method: GET
+URL: /api/admin/reviews/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "nom_user": "John Doe",
+    "des": "Great food!",
+    "stars": 5,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.5.4. UPDATE REVIEW
+Method: PUT
+URL: /api/admin/reviews/{id}
+
+Request Body (all fields optional):
+{
+  "nom_user": "John Updated",
+  "des": "Updated review text",
+  "stars": 4
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Review updated successfully",
+  "data": {
+    "id": 1,
+    "nom_user": "John Updated",
+    "des": "Updated review text",
+    "stars": 4,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.5.5. DELETE REVIEW
+Method: DELETE
+URL: /api/admin/reviews/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Review deleted successfully"
+}
+
+----------------------------------------
+
+2.5.6. GET REVIEW STATISTICS
+Method: GET
+URL: /api/admin/reviews/stats/overview
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "total_reviews": 200,
+    "average_rating": 4.5,
+    "five_star_reviews": 150,
+    "one_star_reviews": 5
+  }
+}
+
+----------------------------------------
+
+2.6. ADMIN LANDING SECTIONS MANAGEMENT
+----------------------------------------
+
+2.6.1. GET ALL LANDING SECTIONS (Paginated)
+Method: GET
+URL: /api/admin/landing-sections
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "background_img": "https://example.com/image.jpg",
+        "title_text": "Welcome to Our Restaurant",
+        "subtitle_text": "Delicious food awaits you",
+        "button_text": "Order Now",
+        "button_link": "https://example.com/order",
+        "is_active": true,
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+2.6.2. CREATE LANDING SECTION
+Method: POST
+URL: /api/admin/landing-sections
+
+Request Body:
+{
+  "background_img": "https://example.com/image.jpg",
+  "title_text": "New Section Title",
+  "subtitle_text": "Subtitle text here",
+  "button_text": "Click Here",
+  "button_link": "https://example.com/link",
+  "is_active": true
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Landing section created successfully",
+  "data": {
+    "id": 2,
+    "background_img": "https://example.com/image.jpg",
+    "title_text": "New Section Title",
+    "subtitle_text": "Subtitle text here",
+    "button_text": "Click Here",
+    "button_link": "https://example.com/link",
+    "is_active": true,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.6.3. GET LANDING SECTION BY ID
+Method: GET
+URL: /api/admin/landing-sections/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "background_img": "https://example.com/image.jpg",
+    "title_text": "Welcome to Our Restaurant",
+    "subtitle_text": "Delicious food awaits you",
+    "button_text": "Order Now",
+    "button_link": "https://example.com/order",
+    "is_active": true,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.6.4. UPDATE LANDING SECTION
+Method: PUT
+URL: /api/admin/landing-sections/{id}
+
+Request Body (all fields optional):
+{
+  "background_img": "https://example.com/new-image.jpg",
+  "title_text": "Updated Title",
+  "subtitle_text": "Updated subtitle",
+  "button_text": "New Button",
+  "button_link": "https://example.com/new-link",
+  "is_active": false
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Landing section updated successfully",
+  "data": {
+    "id": 1,
+    "background_img": "https://example.com/new-image.jpg",
+    "title_text": "Updated Title",
+    "subtitle_text": "Updated subtitle",
+    "button_text": "New Button",
+    "button_link": "https://example.com/new-link",
+    "is_active": false,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.6.5. DELETE LANDING SECTION
+Method: DELETE
+URL: /api/admin/landing-sections/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Landing section deleted successfully"
+}
+
+----------------------------------------
+
+2.6.6. GET LANDING SECTION STATISTICS
+Method: GET
+URL: /api/admin/landing-sections/stats/overview
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "total_sections": 5,
+    "active_sections": 3
+  }
+}
+
+----------------------------------------
+
+2.7. ADMIN SOUS-CATEGORIES MANAGEMENT
+----------------------------------------
+
+2.7.1. GET ALL SOUS-CATEGORIES (Paginated)
+Method: GET
+URL: /api/admin/sous-categories
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "name": "Spicy",
+        "description": "Spicy food items",
+        "id_category": 1,
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+2.7.2. CREATE SOUS-CATEGORY
+Method: POST
+URL: /api/admin/sous-categories
+
+Request Body:
+{
+  "name": "Mild",
+  "description": "Mild flavor items",
+  "id_category": 1
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Sous-category created successfully",
+  "data": {
+    "id": 2,
+    "name": "Mild",
+    "description": "Mild flavor items",
+    "id_category": 1,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.7.3. GET SOUS-CATEGORY BY ID
+Method: GET
+URL: /api/admin/sous-categories/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "Spicy",
+    "description": "Spicy food items",
+    "id_category": 1,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.7.4. UPDATE SOUS-CATEGORY
+Method: PUT
+URL: /api/admin/sous-categories/{id}
+
+Request Body (all fields optional):
+{
+  "name": "Very Spicy",
+  "description": "Very spicy items",
+  "id_category": 2
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Sous-category updated successfully",
+  "data": {
+    "id": 1,
+    "name": "Very Spicy",
+    "description": "Very spicy items",
+    "id_category": 2,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.7.5. DELETE SOUS-CATEGORY
+Method: DELETE
+URL: /api/admin/sous-categories/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Sous-category deleted successfully"
+}
+
+----------------------------------------
+
+2.7.6. GET SOUS-CATEGORY STATISTICS
+Method: GET
+URL: /api/admin/sous-categories/stats/overview
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "total_sous_categories": 20
+  }
+}
+
+----------------------------------------
+
+2.8. ADMIN SOCIAL MEDIA MANAGEMENT
+----------------------------------------
+
+2.8.1. GET ALL SOCIAL MEDIA (Paginated)
+Method: GET
+URL: /api/admin/social-media
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "logo": "https://example.com/logo.png",
+        "instagram": "https://instagram.com/restaurant",
+        "facebook": "https://facebook.com/restaurant",
+        "x": "https://x.com/restaurant",
+        "urls_for_local": [
+          "https://example.com/local1.jpg",
+          "https://example.com/local2.jpg"
+        ],
+        "email": "contact@restaurant.com",
+        "phone": "+1234567890",
+        "tiktok": "https://tiktok.com/@restaurant",
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+2.8.2. CREATE SOCIAL MEDIA
+Method: POST
+URL: /api/admin/social-media
+
+Request Body:
+{
+  "logo": "https://example.com/logo.png",
+  "instagram": "https://instagram.com/restaurant",
+  "facebook": "https://facebook.com/restaurant",
+  "x": "https://x.com/restaurant",
+  "urls_for_local": [
+    "https://example.com/local1.jpg",
+    "https://example.com/local2.jpg"
+  ],
+  "email": "contact@restaurant.com",
+  "phone": "+1234567890",
+  "tiktok": "https://tiktok.com/@restaurant"
+}
+
+Note: All fields are optional
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Social media created successfully",
+  "data": {
+    "id": 1,
+    "logo": "https://example.com/logo.png",
+    "instagram": "https://instagram.com/restaurant",
+    "facebook": "https://facebook.com/restaurant",
+    "x": "https://x.com/restaurant",
+    "urls_for_local": [
+      "https://example.com/local1.jpg",
+      "https://example.com/local2.jpg"
+    ],
+    "email": "contact@restaurant.com",
+    "phone": "+1234567890",
+    "tiktok": "https://tiktok.com/@restaurant",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.8.3. GET SOCIAL MEDIA BY ID
+Method: GET
+URL: /api/admin/social-media/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "logo": "https://example.com/logo.png",
+    "instagram": "https://instagram.com/restaurant",
+    "facebook": "https://facebook.com/restaurant",
+    "x": "https://x.com/restaurant",
+    "urls_for_local": [
+      "https://example.com/local1.jpg",
+      "https://example.com/local2.jpg"
+    ],
+    "email": "contact@restaurant.com",
+    "phone": "+1234567890",
+    "tiktok": "https://tiktok.com/@restaurant",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.8.4. UPDATE SOCIAL MEDIA
+Method: PUT
+URL: /api/admin/social-media/{id}
+
+Request Body (all fields optional):
+{
+  "logo": "https://example.com/new-logo.png",
+  "instagram": "https://instagram.com/newrestaurant",
+  "facebook": "https://facebook.com/newrestaurant",
+  "x": "https://x.com/newrestaurant",
+  "urls_for_local": [
+    "https://example.com/newlocal1.jpg"
+  ],
+  "email": "newcontact@restaurant.com",
+  "phone": "+9876543210",
+  "tiktok": "https://tiktok.com/@newrestaurant"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Social media updated successfully",
+  "data": {
+    "id": 1,
+    "logo": "https://example.com/new-logo.png",
+    "instagram": "https://instagram.com/newrestaurant",
+    "facebook": "https://facebook.com/newrestaurant",
+    "x": "https://x.com/newrestaurant",
+    "urls_for_local": [
+      "https://example.com/newlocal1.jpg"
+    ],
+    "email": "newcontact@restaurant.com",
+    "phone": "+9876543210",
+    "tiktok": "https://tiktok.com/@newrestaurant",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+2.8.5. DELETE SOCIAL MEDIA
+Method: DELETE
+URL: /api/admin/social-media/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Social media deleted successfully"
+}
+
+----------------------------------------
+
+2.8.6. GET SOCIAL MEDIA STATISTICS
+Method: GET
+URL: /api/admin/social-media/stats/overview
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "total_social_media": 5,
+    "with_instagram": 4,
+    "with_facebook": 4,
+    "with_email": 5
+  }
+}
+
+----------------------------------------
+
+2.9. ADMIN DASHBOARD
+----------------------------------------
+
+2.9.1. GET DASHBOARD OVERVIEW
+Method: GET
+URL: /api/admin/dashboard/overview
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Admin dashboard overview",
+  "data": {
+    "total_users": 50,
+    "total_categories": 10,
+    "total_repas": 100,
+    "total_commandes": 500,
+    "total_reviews": 200
+  }
+}
+
+================================================================================
+                        3. USER ENDPOINTS
+================================================================================
+
+NOTE: All user endpoints require authentication (Bearer Token)
+Base URL: /api/user
+
+----------------------------------------
+
+3.1. USER MANAGEMENT
+----------------------------------------
+
+3.1.1. GET ALL USERS (Paginated)
+Method: GET
+URL: /api/user/users
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "username": "johndoe",
+        "email": "john@example.com",
+        "address": "123 Main St",
+        "date_naissance": "1990-01-01",
+        "role": "user",
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+3.1.2. CREATE USER
+Method: POST
+URL: /api/user/users
+
+Request Body:
+{
+  "username": "newuser",
+  "email": "newuser@example.com",
+  "password": "password123",
+  "address": "123 Main St",
+  "date_naissance": "1990-01-01",
+  "role": "user"
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "User created successfully",
+  "data": {
+    "id": 2,
+    "username": "newuser",
+    "email": "newuser@example.com",
+    "address": "123 Main St",
+    "date_naissance": "1990-01-01",
+    "role": "user",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.1.3. GET USER BY ID
+Method: GET
+URL: /api/user/users/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "username": "johndoe",
+    "email": "john@example.com",
+    "address": "123 Main St",
+    "date_naissance": "1990-01-01",
+    "role": "user",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.1.4. UPDATE USER
+Method: PUT
+URL: /api/user/users/{id}
+
+Request Body (all fields optional):
+{
+  "username": "updateduser",
+  "email": "updated@example.com",
+  "password": "newpassword123",
+  "address": "456 New St",
+  "date_naissance": "1990-01-01",
+  "role": "user"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "User updated successfully",
+  "data": {
+    "id": 1,
+    "username": "updateduser",
+    "email": "updated@example.com",
+    "address": "456 New St",
+    "date_naissance": "1990-01-01",
+    "role": "user",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.1.5. DELETE USER
+Method: DELETE
+URL: /api/user/users/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "User deleted successfully"
+}
+
+----------------------------------------
+
+3.2. CATEGORIES
+----------------------------------------
+
+3.2.1. GET ALL CATEGORIES (Paginated)
+Method: GET
+URL: /api/user/categories
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "name": "Main Course",
+        "sousCategories": [],
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+3.2.2. CREATE CATEGORY
+Method: POST
+URL: /api/user/categories
+
+Request Body:
+{
+  "name": "Desserts"
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Category created successfully",
+  "data": {
+    "id": 2,
+    "name": "Desserts",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.2.3. GET CATEGORY BY ID
+Method: GET
+URL: /api/user/categories/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "Main Course",
+    "sousCategories": [],
+    "repas": [],
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.2.4. UPDATE CATEGORY
+Method: PUT
+URL: /api/user/categories/{id}
+
+Request Body:
+{
+  "name": "Updated Category Name"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Category updated successfully",
+  "data": {
+    "id": 1,
+    "name": "Updated Category Name",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.2.5. DELETE CATEGORY
+Method: DELETE
+URL: /api/user/categories/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Category deleted successfully"
+}
+
+----------------------------------------
+
+3.3. SOUS-CATEGORIES
+----------------------------------------
+
+3.3.1. GET ALL SOUS-CATEGORIES (Paginated)
+Method: GET
+URL: /api/user/sous-categories
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "name": "Spicy",
+        "description": "Spicy food items",
+        "id_category": 1,
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+3.3.2. CREATE SOUS-CATEGORY
+Method: POST
+URL: /api/user/sous-categories
+
+Request Body:
+{
+  "name": "Mild",
+  "description": "Mild flavor items",
+  "id_category": 1
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Sous-category created successfully",
+  "data": {
+    "id": 2,
+    "name": "Mild",
+    "description": "Mild flavor items",
+    "id_category": 1,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.3.3. GET SOUS-CATEGORY BY ID
+Method: GET
+URL: /api/user/sous-categories/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "Spicy",
+    "description": "Spicy food items",
+    "id_category": 1,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.3.4. UPDATE SOUS-CATEGORY
+Method: PUT
+URL: /api/user/sous-categories/{id}
+
+Request Body (all fields optional):
+{
+  "name": "Very Spicy",
+  "description": "Very spicy items",
+  "id_category": 2
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Sous-category updated successfully",
+  "data": {
+    "id": 1,
+    "name": "Very Spicy",
+    "description": "Very spicy items",
+    "id_category": 2,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.3.5. DELETE SOUS-CATEGORY
+Method: DELETE
+URL: /api/user/sous-categories/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Sous-category deleted successfully"
+}
+
+----------------------------------------
+
+3.3.6. GET SOUS-CATEGORIES BY CATEGORY
+Method: GET
+URL: /api/user/sous-categories/category/{categoryId}
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "name": "Spicy",
+        "description": "Spicy food items",
+        "id_category": 1,
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+3.4. REPAS
+----------------------------------------
+
+3.4.1. GET ALL REPAS (Paginated)
+Method: GET
+URL: /api/user/repas
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "name": "Grilled Chicken",
+        "description": "Delicious grilled chicken",
+        "vegan": false,
+        "onView": true,
+        "qte": 50,
+        "id_category": 1,
+        "imgs_urls": [
+          "https://example.com/image1.jpg",
+          "https://example.com/image2.jpg"
+        ],
+        "category": {
+          "id": 1,
+          "name": "Main Course"
+        },
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+3.4.2. CREATE REPAS
+Method: POST
+URL: /api/user/repas
+
+Request Body:
+{
+  "name": "Vegetarian Pizza",
+  "description": "Fresh vegetables on pizza",
+  "vegan": true,
+  "onView": true,
+  "qte": 30,
+  "id_category": 1,
+  "imgs_urls": [
+    "https://example.com/pizza1.jpg",
+    "https://example.com/pizza2.jpg"
+  ]
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Repas created successfully",
+  "data": {
+    "id": 2,
+    "name": "Vegetarian Pizza",
+    "description": "Fresh vegetables on pizza",
+    "vegan": true,
+    "onView": true,
+    "qte": 30,
+    "id_category": 1,
+    "imgs_urls": [
+      "https://example.com/pizza1.jpg",
+      "https://example.com/pizza2.jpg"
+    ],
+    "category": {
+      "id": 1,
+      "name": "Main Course"
+    },
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.4.3. GET REPAS BY ID
+Method: GET
+URL: /api/user/repas/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "Grilled Chicken",
+    "description": "Delicious grilled chicken",
+    "vegan": false,
+    "onView": true,
+    "qte": 50,
+    "id_category": 1,
+    "imgs_urls": [
+      "https://example.com/image1.jpg",
+      "https://example.com/image2.jpg"
+    ],
+    "category": {...},
+    "commandes": [],
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.4.4. UPDATE REPAS
+Method: PUT
+URL: /api/user/repas/{id}
+
+Request Body (all fields optional):
+{
+  "name": "Updated Repas Name",
+  "description": "Updated description",
+  "vegan": false,
+  "onView": true,
+  "qte": 40,
+  "id_category": 2,
+  "imgs_urls": [
+    "https://example.com/updated1.jpg",
+    "https://example.com/updated2.jpg"
+  ]
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Repas updated successfully",
+  "data": {
+    "id": 1,
+    "name": "Updated Repas Name",
+    "description": "Updated description",
+    "vegan": false,
+    "onView": true,
+    "qte": 40,
+    "id_category": 2,
+    "imgs_urls": [
+      "https://example.com/updated1.jpg",
+      "https://example.com/updated2.jpg"
+    ],
+    "category": {...},
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.4.5. DELETE REPAS
+Method: DELETE
+URL: /api/user/repas/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Repas deleted successfully"
+}
+
+----------------------------------------
+
+3.4.6. GET REPAS BY CATEGORY
+Method: GET
+URL: /api/user/repas/category/{categoryId}
+Query Parameters:
+  - per_page: number (default: 10)
+
+Note: Only returns repas where onView = true
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "name": "Grilled Chicken",
+        "description": "Delicious grilled chicken",
+        "vegan": false,
+        "onView": true,
+        "qte": 50,
+        "id_category": 1,
+        "imgs_urls": [
+          "https://example.com/image1.jpg",
+          "https://example.com/image2.jpg"
+        ],
+        "category": {...},
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+3.5. COMMANDES
+----------------------------------------
+
+3.5.1. GET ALL COMMANDES (Paginated)
+Method: GET
+URL: /api/user/commandes
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "id_user": 1,
+        "id_repas": 1,
+        "address": "123 Main St",
+        "name": "John Doe",
+        "user": {
+          "id": 1,
+          "username": "johndoe",
+          "email": "john@example.com"
+        },
+        "repas": {
+          "id": 1,
+          "name": "Grilled Chicken"
+        },
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+3.5.2. CREATE COMMANDE
+Method: POST
+URL: /api/user/commandes
+
+Request Body:
+{
+  "id_user": 1,
+  "id_repas": 1,
+  "address": "123 Main St",
+  "name": "John Doe"
+}
+
+Note: This endpoint checks if repas is available (onView = true and qte > 0)
+      and automatically decrements the quantity after creating the commande.
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Commande created successfully",
+  "data": {
+    "id": 2,
+    "id_user": 1,
+    "id_repas": 1,
+    "address": "123 Main St",
+    "name": "John Doe",
+    "user": {...},
+    "repas": {...},
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+Error Response (400) - Repas not available:
+{
+  "success": false,
+  "message": "Repas not available"
+}
+
+----------------------------------------
+
+3.5.3. GET COMMANDE BY ID
+Method: GET
+URL: /api/user/commandes/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "id_user": 1,
+    "id_repas": 1,
+    "address": "123 Main St",
+    "name": "John Doe",
+    "user": {...},
+    "repas": {...},
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.5.4. UPDATE COMMANDE
+Method: PUT
+URL: /api/user/commandes/{id}
+
+Request Body (all fields optional):
+{
+  "id_user": 2,
+  "id_repas": 2,
+  "address": "456 New St",
+  "name": "Jane Doe"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Commande updated successfully",
+  "data": {
+    "id": 1,
+    "id_user": 2,
+    "id_repas": 2,
+    "address": "456 New St",
+    "name": "Jane Doe",
+    "user": {...},
+    "repas": {...},
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.5.5. DELETE COMMANDE
+Method: DELETE
+URL: /api/user/commandes/{id}
+
+Note: This endpoint automatically restores the quantity of the repas when
+      a commande is deleted (increments qte).
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Commande deleted successfully"
+}
+
+----------------------------------------
+
+3.5.6. GET COMMANDES BY USER
+Method: GET
+URL: /api/user/commandes/user/{userId}
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "id_user": 1,
+        "id_repas": 1,
+        "address": "123 Main St",
+        "name": "John Doe",
+        "user": {...},
+        "repas": {...},
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+3.6. REVIEWS
+----------------------------------------
+
+3.6.1. GET ALL REVIEWS (Paginated)
+Method: GET
+URL: /api/user/reviews
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "nom_user": "John Doe",
+        "des": "Great food!",
+        "stars": 5,
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+3.6.2. CREATE REVIEW
+Method: POST
+URL: /api/user/reviews
+
+Request Body:
+{
+  "nom_user": "Jane Doe",
+  "des": "Excellent service and food quality",
+  "stars": 5
+}
+
+Note: stars must be between 1 and 5
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Review created successfully",
+  "data": {
+    "id": 2,
+    "nom_user": "Jane Doe",
+    "des": "Excellent service and food quality",
+    "stars": 5,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.6.3. GET REVIEW BY ID
+Method: GET
+URL: /api/user/reviews/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "nom_user": "John Doe",
+    "des": "Great food!",
+    "stars": 5,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.6.4. UPDATE REVIEW
+Method: PUT
+URL: /api/user/reviews/{id}
+
+Request Body (all fields optional):
+{
+  "nom_user": "John Updated",
+  "des": "Updated review text",
+  "stars": 4
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Review updated successfully",
+  "data": {
+    "id": 1,
+    "nom_user": "John Updated",
+    "des": "Updated review text",
+    "stars": 4,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.6.5. DELETE REVIEW
+Method: DELETE
+URL: /api/user/reviews/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Review deleted successfully"
+}
+
+----------------------------------------
+
+3.7. LANDING SECTIONS
+----------------------------------------
+
+3.7.1. GET ALL LANDING SECTIONS (Paginated)
+Method: GET
+URL: /api/user/landing-sections
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "background_img": "https://example.com/image.jpg",
+        "title_text": "Welcome to Our Restaurant",
+        "subtitle_text": "Delicious food awaits you",
+        "button_text": "Order Now",
+        "button_link": "https://example.com/order",
+        "is_active": true,
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+3.7.2. CREATE LANDING SECTION
+Method: POST
+URL: /api/user/landing-sections
+
+Request Body:
+{
+  "background_img": "https://example.com/image.jpg",
+  "title_text": "New Section Title",
+  "subtitle_text": "Subtitle text here",
+  "button_text": "Click Here",
+  "button_link": "https://example.com/link",
+  "is_active": true
+}
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Landing section created successfully",
+  "data": {
+    "id": 2,
+    "background_img": "https://example.com/image.jpg",
+    "title_text": "New Section Title",
+    "subtitle_text": "Subtitle text here",
+    "button_text": "Click Here",
+    "button_link": "https://example.com/link",
+    "is_active": true,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.7.3. GET ACTIVE LANDING SECTIONS (Paginated)
+Method: GET
+URL: /api/user/landing-sections/active
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "background_img": "https://example.com/image.jpg",
+        "title_text": "Welcome to Our Restaurant",
+        "subtitle_text": "Delicious food awaits you",
+        "button_text": "Order Now",
+        "button_link": "https://example.com/order",
+        "is_active": true,
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+3.7.4. GET LANDING SECTION BY ID
+Method: GET
+URL: /api/user/landing-sections/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "background_img": "https://example.com/image.jpg",
+    "title_text": "Welcome to Our Restaurant",
+    "subtitle_text": "Delicious food awaits you",
+    "button_text": "Order Now",
+    "button_link": "https://example.com/order",
+    "is_active": true,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.7.5. UPDATE LANDING SECTION
+Method: PUT
+URL: /api/user/landing-sections/{id}
+
+Request Body (all fields optional):
+{
+  "background_img": "https://example.com/new-image.jpg",
+  "title_text": "Updated Title",
+  "subtitle_text": "Updated subtitle",
+  "button_text": "New Button",
+  "button_link": "https://example.com/new-link",
+  "is_active": false
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Landing section updated successfully",
+  "data": {
+    "id": 1,
+    "background_img": "https://example.com/new-image.jpg",
+    "title_text": "Updated Title",
+    "subtitle_text": "Updated subtitle",
+    "button_text": "New Button",
+    "button_link": "https://example.com/new-link",
+    "is_active": false,
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.7.6. DELETE LANDING SECTION
+Method: DELETE
+URL: /api/user/landing-sections/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Landing section deleted successfully"
+}
+
+----------------------------------------
+
+3.8. SOCIAL MEDIA
+----------------------------------------
+
+3.8.1. GET ALL SOCIAL MEDIA (Paginated)
+Method: GET
+URL: /api/user/social-media
+Query Parameters:
+  - per_page: number (default: 10)
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "current_page": 1,
+    "data": [
+      {
+        "id": 1,
+        "logo": "https://example.com/logo.png",
+        "instagram": "https://instagram.com/restaurant",
+        "facebook": "https://facebook.com/restaurant",
+        "x": "https://x.com/restaurant",
+        "urls_for_local": [
+          "https://example.com/local1.jpg",
+          "https://example.com/local2.jpg"
+        ],
+        "email": "contact@restaurant.com",
+        "phone": "+1234567890",
+        "tiktok": "https://tiktok.com/@restaurant",
+        "created_at": "2024-01-01T00:00:00.000000Z",
+        "updated_at": "2024-01-01T00:00:00.000000Z"
+      }
+    ],
+    "per_page": 10,
+    "total": 1
+  }
+}
+
+----------------------------------------
+
+3.8.2. CREATE SOCIAL MEDIA
+Method: POST
+URL: /api/user/social-media
+
+Request Body:
+{
+  "logo": "https://example.com/logo.png",
+  "instagram": "https://instagram.com/restaurant",
+  "facebook": "https://facebook.com/restaurant",
+  "x": "https://x.com/restaurant",
+  "urls_for_local": [
+    "https://example.com/local1.jpg",
+    "https://example.com/local2.jpg"
+  ],
+  "email": "contact@restaurant.com",
+  "phone": "+1234567890",
+  "tiktok": "https://tiktok.com/@restaurant"
+}
+
+Note: All fields are optional
+
+Success Response (201):
+{
+  "success": true,
+  "message": "Social media created successfully",
+  "data": {
+    "id": 1,
+    "logo": "https://example.com/logo.png",
+    "instagram": "https://instagram.com/restaurant",
+    "facebook": "https://facebook.com/restaurant",
+    "x": "https://x.com/restaurant",
+    "urls_for_local": [
+      "https://example.com/local1.jpg",
+      "https://example.com/local2.jpg"
+    ],
+    "email": "contact@restaurant.com",
+    "phone": "+1234567890",
+    "tiktok": "https://tiktok.com/@restaurant",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.8.3. GET SOCIAL MEDIA BY ID
+Method: GET
+URL: /api/user/social-media/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "logo": "https://example.com/logo.png",
+    "instagram": "https://instagram.com/restaurant",
+    "facebook": "https://facebook.com/restaurant",
+    "x": "https://x.com/restaurant",
+    "urls_for_local": [
+      "https://example.com/local1.jpg",
+      "https://example.com/local2.jpg"
+    ],
+    "email": "contact@restaurant.com",
+    "phone": "+1234567890",
+    "tiktok": "https://tiktok.com/@restaurant",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.8.4. UPDATE SOCIAL MEDIA
+Method: PUT
+URL: /api/user/social-media/{id}
+
+Request Body (all fields optional):
+{
+  "logo": "https://example.com/new-logo.png",
+  "instagram": "https://instagram.com/newrestaurant",
+  "facebook": "https://facebook.com/newrestaurant",
+  "x": "https://x.com/newrestaurant",
+  "urls_for_local": [
+    "https://example.com/newlocal1.jpg"
+  ],
+  "email": "newcontact@restaurant.com",
+  "phone": "+9876543210",
+  "tiktok": "https://tiktok.com/@newrestaurant"
+}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Social media updated successfully",
+  "data": {
+    "id": 1,
+    "logo": "https://example.com/new-logo.png",
+    "instagram": "https://instagram.com/newrestaurant",
+    "facebook": "https://facebook.com/newrestaurant",
+    "x": "https://x.com/newrestaurant",
+    "urls_for_local": [
+      "https://example.com/newlocal1.jpg"
+    ],
+    "email": "newcontact@restaurant.com",
+    "phone": "+9876543210",
+    "tiktok": "https://tiktok.com/@newrestaurant",
+    "created_at": "2024-01-01T00:00:00.000000Z",
+    "updated_at": "2024-01-01T00:00:00.000000Z"
+  }
+}
+
+----------------------------------------
+
+3.8.5. DELETE SOCIAL MEDIA
+Method: DELETE
+URL: /api/user/social-media/{id}
+
+Success Response (200):
+{
+  "success": true,
+  "message": "Social media deleted successfully"
+}
+
+================================================================================
+                        4. PAGINATION DETAILS
+================================================================================
+
+All GET endpoints that return lists support pagination with the following
+query parameter:
+
+  - per_page: number (default: 10) - Number of items per page
+
+Pagination Response Structure:
+{
+  "success": true,
+  "data": {
+    "current_page": 1,           // Current page number
+    "data": [...],               // Array of items
+    "first_page_url": "...",     // URL to first page
+    "from": 1,                   // Starting item number
+    "last_page": 5,              // Last page number
+    "last_page_url": "...",      // URL to last page
+    "links": [                   // Navigation links
+      {
+        "url": null,
+        "label": "&laquo; Previous",
+        "active": false
+      },
+      ...
+    ],
+    "next_page_url": "...",      // URL to next page (null if last page)
+    "path": "...",               // Base path
+    "per_page": 10,              // Items per page
+    "prev_page_url": null,       // URL to previous page (null if first page)
+    "to": 10,                    // Ending item number
+    "total": 50                  // Total number of items
+  }
+}
+
+Example Pagination Requests:
+  - /api/admin/users?per_page=20
+  - /api/user/repas?per_page=5
+  - /api/admin/categories?per_page=15
+
+================================================================================
+                        5. ERROR RESPONSES
+================================================================================
+
+5.1. VALIDATION ERROR (422)
+----------------------------------------
+{
+  "success": false,
+  "message": "Validation errors",
+  "errors": {
+    "field_name": [
+      "Error message 1",
+      "Error message 2"
+    ]
+  }
+}
+
+5.2. NOT FOUND ERROR (404)
+----------------------------------------
+{
+  "success": false,
+  "message": "Resource not found"
+}
+
+5.3. UNAUTHORIZED ERROR (401)
+----------------------------------------
+{
+  "success": false,
+  "message": "Invalid credentials"
+}
+
+OR (when token is missing/invalid):
+{
+  "message": "Unauthenticated."
+}
+
+5.4. BAD REQUEST ERROR (400)
+----------------------------------------
+{
+  "success": false,
+  "message": "Error message"
+}
+
+5.5. SERVER ERROR (500)
+----------------------------------------
+{
+  "success": false,
+  "message": "Error message"
+}
+
+================================================================================
+                        6. TESTING NOTES
+================================================================================
+
+1. AUTHENTICATION:
+   - First, register or login to get a token
+   - Use the token in the Authorization header: "Bearer {token}"
+   - All protected endpoints require this token
+
+2. PAGINATION:
+   - Use ?per_page={number} query parameter to control items per page
+   - Default is 10 items per page
+   - Pagination info is included in the response
+
+3. REQUEST METHODS:
+   - GET: Retrieve data
+   - POST: Create new resource
+   - PUT: Update entire resource (all fields)
+   - DELETE: Delete resource
+
+4. VALIDATION:
+   - All required fields must be provided
+   - Check validation rules in controllers
+   - Validation errors return 422 status code
+
+5. SPECIAL BEHAVIORS:
+   - User Commande POST: Automatically decrements repas quantity
+   - User Commande DELETE: Automatically restores repas quantity
+   - User Repas by Category: Only returns repas where onView = true
+   - Admin Repas Toggle Visibility: Toggles onView field
+
+6. TESTING TOOLS:
+   - Postman
+   - cURL
+   - Insomnia
+   - Thunder Client (VS Code extension)
+   - HTTPie
+
+================================================================================
+                        7. EXAMPLE TESTING FLOW
+================================================================================
+
+1. Register a new user:
+   POST /api/register
+   Body: { username, email, password, password_confirmation, address, date_naissance }
+
+2. Login:
+   POST /api/login
+   Body: { email, password }
+   Save the token from response
+
+3. Get profile:
+   GET /api/profile
+   Headers: Authorization: Bearer {token}
+
+4. Get all categories (paginated):
+   GET /api/user/categories?per_page=10
+   Headers: Authorization: Bearer {token}
+
+5. Create a category:
+   POST /api/user/categories
+   Headers: Authorization: Bearer {token}
+   Body: { name: "Desserts" }
+
+6. Get category by ID:
+   GET /api/user/categories/1
+   Headers: Authorization: Bearer {token}
+
+7. Update category:
+   PUT /api/user/categories/1
+   Headers: Authorization: Bearer {token}
+   Body: { name: "Updated Desserts" }
+
+8. Delete category:
+   DELETE /api/user/categories/1
+   Headers: Authorization: Bearer {token}
+
+================================================================================
+                              END OF DOCUMENTATION
+================================================================================
+

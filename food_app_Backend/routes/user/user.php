@@ -8,6 +8,7 @@ use App\Http\Controllers\User\CommandeController;
 use App\Http\Controllers\User\ReviewController;
 use App\Http\Controllers\User\LandingSectionController;
 use App\Http\Controllers\User\SousCategoryController;
+use App\Http\Controllers\User\SocialMediaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,5 +87,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{id}', [LandingSectionController::class, 'show']);
         Route::put('/{id}', [LandingSectionController::class, 'update']);
         Route::delete('/{id}', [LandingSectionController::class, 'destroy']);
+    });
+
+    // SocialMedia routes
+    Route::prefix('social-media')->group(function () {
+        Route::get('/', [SocialMediaController::class, 'index']);
+        Route::post('/', [SocialMediaController::class, 'store']);
+        Route::get('/{id}', [SocialMediaController::class, 'show']);
+        Route::put('/{id}', [SocialMediaController::class, 'update']);
+        Route::delete('/{id}', [SocialMediaController::class, 'destroy']);
     });
 });

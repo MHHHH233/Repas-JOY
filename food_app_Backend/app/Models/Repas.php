@@ -12,13 +12,15 @@ class Repas extends Model
         'vegan',
         'onView',
         'qte',
-        'id_category'
+        'id_category',
+        'imgs_urls'
     ];
 
     protected $casts = [
         'vegan' => 'boolean',
         'onView' => 'boolean',
-        'qte' => 'integer'
+        'qte' => 'integer',
+        'imgs_urls' => 'array'
     ];
 
     public function category()

@@ -14,4 +14,3 @@ const adminReviewsService = {
 
 export default adminReviewsService;
 
-

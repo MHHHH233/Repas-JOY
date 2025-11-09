@@ -1,9 +1,9 @@
 import apiClient from '../../apiclient';
-import endpoints from '../../endpoints/admin/categories';
+import endpoints from '../../endpoints/admin/landingSections';
 
 const ok = (r) => (r.status === 200 || r.status === 201) ? r.data : Promise.reject(r);
 
-const adminCategoriesService = {
+const adminLandingSectionsService = {
     list: (params = {}) => apiClient.get(endpoints.list, { params }).then(ok),
     create: (payload) => apiClient.post(endpoints.create, payload).then(ok),
     get: (id) => apiClient.get(endpoints.one(id)).then(ok),
@@ -12,6 +12,5 @@ const adminCategoriesService = {
     statsOverview: () => apiClient.get(endpoints.statsOverview).then(ok),
 };
 
-export default adminCategoriesService;
-
+export default adminLandingSectionsService;
 

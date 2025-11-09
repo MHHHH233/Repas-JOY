@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\Repas;
-use App\Models\Category;
+use App\Models\SocialMedia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class RepasController extends Controller
+class SocialMediaController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,10 +15,10 @@ class RepasController extends Controller
     public function index(Request $request)
     {
         $perPage = (int) $request->query('per_page', 10);
-        $repas = Repas::with('category')->paginate($perPage);
+        $socialMedia = SocialMedia::paginate($perPage);
         return response()->json([
             'success' => true,
-            'data' => $repas
+            'data' => $socialMedia
         ]);
     }
 
@@ -29,14 +28,15 @@ class RepasController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'vegan' => 'required|boolean',
-            'onView' => 'required|boolean',
-            'qte' => 'required|integer|min:0',
-            'id_category' => 'required|exists:categories,id',
-            'imgs_urls' => 'nullable|array',
-            'imgs_urls.*' => 'url'
+            'logo' => 'nullable|string|max:255',
+            'instagram' => 'nullable|url|max:255',
+            'facebook' => 'nullable|url|max:255',
+            'x' => 'nullable|url|max:255',
+            'urls_for_local' => 'nullable|array',
+            'urls_for_local.*' => 'url',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:255',
+            'tiktok' => 'nullable|url|max:255'
         ]);
 
         if ($validator->fails()) {
@@ -47,12 +47,12 @@ class RepasController extends Controller
             ], 422);
         }
 
-        $repas = Repas::create($request->all());
+        $socialMedia = SocialMedia::create($request->all());
 
         return response()->json([
             'success' => true,
-            'message' => 'Repas created successfully',
-            'data' => $repas->load('category')
+            'message' => 'Social media created successfully',
+            'data' => $socialMedia
         ], 201);
     }
 
@@ -61,18 +61,18 @@ class RepasController extends Controller
      */
     public function show(string $id)
     {
-        $repas = Repas::with('category', 'commandes')->find($id);
+        $socialMedia = SocialMedia::find($id);
         
-        if (!$repas) {
+        if (!$socialMedia) {
             return response()->json([
                 'success' => false,
-                'message' => 'Repas not found'
+                'message' => 'Social media not found'
             ], 404);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $repas
+            'data' => $socialMedia
         ]);
     }
 
@@ -81,24 +81,25 @@ class RepasController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $repas = Repas::find($id);
+        $socialMedia = SocialMedia::find($id);
         
-        if (!$repas) {
+        if (!$socialMedia) {
             return response()->json([
                 'success' => false,
-                'message' => 'Repas not found'
+                'message' => 'Social media not found'
             ], 404);
         }
 
         $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|string|max:255',
-            'description' => 'sometimes|string',
-            'vegan' => 'sometimes|boolean',
-            'onView' => 'sometimes|boolean',
-            'qte' => 'sometimes|integer|min:0',
-            'id_category' => 'sometimes|exists:categories,id',
-            'imgs_urls' => 'sometimes|array',
-            'imgs_urls.*' => 'url'
+            'logo' => 'sometimes|string|max:255',
+            'instagram' => 'sometimes|url|max:255',
+            'facebook' => 'sometimes|url|max:255',
+            'x' => 'sometimes|url|max:255',
+            'urls_for_local' => 'sometimes|array',
+            'urls_for_local.*' => 'url',
+            'email' => 'sometimes|email|max:255',
+            'phone' => 'sometimes|string|max:255',
+            'tiktok' => 'sometimes|url|max:255'
         ]);
 
         if ($validator->fails()) {
@@ -109,12 +110,12 @@ class RepasController extends Controller
             ], 422);
         }
 
-        $repas->update($request->all());
+        $socialMedia->update($request->all());
 
         return response()->json([
             'success' => true,
-            'message' => 'Repas updated successfully',
-            'data' => $repas->load('category')
+            'message' => 'Social media updated successfully',
+            'data' => $socialMedia
         ]);
     }
 
@@ -123,37 +124,20 @@ class RepasController extends Controller
      */
     public function destroy(string $id)
     {
-        $repas = Repas::find($id);
+        $socialMedia = SocialMedia::find($id);
         
-        if (!$repas) {
+        if (!$socialMedia) {
             return response()->json([
                 'success' => false,
-                'message' => 'Repas not found'
+                'message' => 'Social media not found'
             ], 404);
         }
 
-        $repas->delete();
+        $socialMedia->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Repas deleted successfully'
-        ]);
-    }
-
-    /**
-     * Get repas by category
-     */
-    public function getByCategory(Request $request, string $categoryId)
-    {
-        $perPage = (int) $request->query('per_page', 10);
-        $repas = Repas::with('category')
-            ->where('id_category', $categoryId)
-            ->where('onView', true)
-            ->paginate($perPage);
-
-        return response()->json([
-            'success' => true,
-            'data' => $repas
+            'message' => 'Social media deleted successfully'
         ]);
     }
 }

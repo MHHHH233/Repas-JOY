@@ -14,4 +14,3 @@ const adminUsersService = {
 
 export default adminUsersService;
 
-
