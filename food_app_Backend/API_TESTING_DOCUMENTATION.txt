@@ -795,11 +795,14 @@ URL: /api/admin/commandes
 
 Request Body:
 {
-  "id_user": 1,
+  "id_user": 1,  // optional - can be omitted for walk-in customers without accounts
   "id_repas": 1,
   "address": "123 Main St",
   "name": "John Doe"
 }
+
+Note: The id_user field is optional - if omitted, the commande will be created
+      for a walk-in customer without an account.
 
 Success Response (201):
 {
@@ -848,7 +851,7 @@ URL: /api/admin/commandes/{id}
 
 Request Body (all fields optional):
 {
-  "id_user": 2,
+  "id_user": 2,  // optional - can be null to remove user association
   "id_repas": 2,
   "address": "456 New St",
   "name": "Jane Doe"
@@ -2159,7 +2162,7 @@ URL: /api/user/commandes
 
 Request Body:
 {
-  "id_user": 1,
+  "id_user": 1,  // optional - can be omitted for walk-in customers without accounts
   "id_repas": 1,
   "address": "123 Main St",
   "name": "John Doe"
@@ -2167,6 +2170,8 @@ Request Body:
 
 Note: This endpoint checks if repas is available (onView = true and qte > 0)
       and automatically decrements the quantity after creating the commande.
+      The id_user field is optional - if omitted, the commande will be created
+      for a walk-in customer without an account.
 
 Success Response (201):
 {
@@ -2221,7 +2226,7 @@ URL: /api/user/commandes/{id}
 
 Request Body (all fields optional):
 {
-  "id_user": 2,
+  "id_user": 2,  // optional - can be null to remove user association
   "id_repas": 2,
   "address": "456 New St",
   "name": "Jane Doe"
@@ -2858,6 +2863,7 @@ OR (when token is missing/invalid):
    - User Commande DELETE: Automatically restores repas quantity
    - User Repas by Category: Only returns repas where onView = true
    - Admin Repas Toggle Visibility: Toggles onView field
+   - Commande id_user: Optional field - can be omitted for walk-in customers without accounts
 
 6. TESTING TOOLS:
    - Postman

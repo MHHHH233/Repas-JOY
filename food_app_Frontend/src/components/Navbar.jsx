@@ -1,18 +1,76 @@
 "use client"
 
-import { useState } from "react"
-import { Link } from "react-router-dom"
-import { ShoppingCart, Menu, X, MapPin, User, Bell } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { ShoppingCart, Menu, X, MapPin, User, Bell, LogOut } from "lucide-react"
 import { useCart } from "../context/CartContext"
 import { motion, AnimatePresence } from "framer-motion"
 import { LocationSelector } from "./LocationSelector"
 import Logo from "../assets/Logo-.png"
+import authService from "../lib/services/front/authService"
 
 export function Navbar() {
   const { cart } = useCart()
+  const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
   const [showLocationModal, setShowLocationModal] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [user, setUser] = useState(null)
   const itemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0)
+
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = sessionStorage.getItem("token")
+      const storedUser = sessionStorage.getItem("user")
+      
+      if (token && storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser)
+          setUser(parsedUser)
+          setIsAuthenticated(true)
+        } catch (e) {
+          setIsAuthenticated(false)
+          setUser(null)
+        }
+      } else {
+        setIsAuthenticated(false)
+        setUser(null)
+      }
+    }
+
+    checkAuth()
+    
+    // Listen for storage changes (e.g., when user logs in/out in another tab)
+    window.addEventListener("storage", checkAuth)
+    
+    // Custom event for login/logout in same tab
+    window.addEventListener("authChange", checkAuth)
+    
+    return () => {
+      window.removeEventListener("storage", checkAuth)
+      window.removeEventListener("authChange", checkAuth)
+    }
+  }, [])
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout()
+      setIsAuthenticated(false)
+      setUser(null)
+      navigate("/")
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new Event("authChange"))
+    } catch (error) {
+      console.error("Logout error:", error)
+      // Still clear local state even if API call fails
+      setIsAuthenticated(false)
+      setUser(null)
+      navigate("/")
+      window.dispatchEvent(new Event("authChange"))
+    }
+  }
+
+  const isAdmin = user?.role === "admin"
 
   return (
     <>
@@ -53,29 +111,57 @@ export function Navbar() {
               <Link to="/alcohol" className="text-gray-600 hover:text-orange-600 transition font-medium">
                 Alcohol
               </Link>
-              <Link to="/admin" className="text-gray-600 hover:text-orange-600 transition font-medium">
-                Admin
-              </Link>
+              {isAdmin && (
+                <Link to="/admin" className="text-gray-600 hover:text-orange-600 transition font-medium">
+                  Admin
+                </Link>
+              )}
             </div>
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-4">
-              {/* Sign In / Sign Up Links */}
-              <div className="hidden md:flex items-center gap-2">
-                <Link 
-                  to="/signin" 
-                  className="text-gray-600 hover:text-orange-600 transition font-medium text-sm"
-                >
-                  Sign In
-                </Link>
-                <span className="text-gray-300">|</span>
-                <Link 
-                  to="/signup" 
-                  className="text-gray-600 hover:text-orange-600 transition font-medium text-sm"
-                >
-                  Sign Up
-                </Link>
-              </div>
+              {/* Sign In / Sign Up Links - Only show when not authenticated */}
+              {!isAuthenticated && (
+                <div className="hidden md:flex items-center gap-2">
+                  <Link 
+                    to="/signin" 
+                    className="text-gray-600 hover:text-orange-600 transition font-medium text-sm"
+                  >
+                    Sign In
+                  </Link>
+                  <span className="text-gray-300">|</span>
+                  <Link 
+                    to="/signup" 
+                    className="text-gray-600 hover:text-orange-600 transition font-medium text-sm"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+
+              {/* User Info and Logout - Only show when authenticated */}
+              {isAuthenticated && (
+                <div className="hidden md:flex items-center gap-3">
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <User className="w-4 h-4" />
+                    <span className="text-sm font-medium">{user?.username || "User"}</span>
+                    {isAdmin && (
+                      <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-semibold">
+                        Admin
+                      </span>
+                    )}
+                  </div>
+                  <motion.button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 text-gray-600 hover:text-orange-600 transition font-medium text-sm"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </motion.button>
+                </div>
+              )}
 
               {/* DashPass CTA */}
               <motion.button 
@@ -94,10 +180,14 @@ export function Navbar() {
                 </span>
               </button>
 
-              {/* User Account */}
-              <button className="p-2 hover:bg-gray-100 rounded-lg transition">
-                <User className="w-5 h-5 text-gray-700" />
-              </button>
+              {/* User Account Icon - Only show when authenticated */}
+              {isAuthenticated && (
+                <Link to={isAdmin ? "/admin/profile" : "#"}>
+                  <button className="p-2 hover:bg-gray-100 rounded-lg transition">
+                    <User className="w-5 h-5 text-gray-700" />
+                  </button>
+                </Link>
+              )}
 
               {/* Cart Button */}
               <Link to="/cart">
@@ -162,28 +252,69 @@ export function Navbar() {
                 >
                   Alcohol
                 </Link>
-                <Link
-                  to="/admin"
-                  className="block px-4 py-2 text-gray-600 hover:text-orange-600 hover:bg-gray-50 rounded transition"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Admin
-                </Link>
-                <div className="px-4 py-2 space-y-2">
+                {isAdmin && (
                   <Link
-                    to="/signin"
-                    className="block w-full text-center text-gray-600 hover:text-orange-600 hover:bg-gray-50 rounded transition py-2"
+                    to="/admin"
+                    className="block px-4 py-2 text-gray-600 hover:text-orange-600 hover:bg-gray-50 rounded transition"
                     onClick={() => setIsOpen(false)}
                   >
-                    Sign In
+                    Admin
                   </Link>
-                  <Link
-                    to="/signup"
-                    className="block w-full text-center text-gray-600 hover:text-orange-600 hover:bg-gray-50 rounded transition py-2"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Sign Up
-                  </Link>
+                )}
+                <div className="px-4 py-2 space-y-2 border-t border-gray-200 pt-4 mt-2">
+                  {!isAuthenticated ? (
+                    <>
+                      <Link
+                        to="/signin"
+                        className="block w-full text-center text-gray-600 hover:text-orange-600 hover:bg-gray-50 rounded transition py-2"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Sign In
+                      </Link>
+                      <Link
+                        to="/signup"
+                        className="block w-full text-center text-gray-600 hover:text-orange-600 hover:bg-gray-50 rounded transition py-2"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Sign Up
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <div className="px-2 py-2 text-center text-gray-700">
+                        <div className="flex items-center justify-center gap-2 mb-1">
+                          <User className="w-4 h-4" />
+                          <span className="font-medium">{user?.username || "User"}</span>
+                        </div>
+                        {isAdmin && (
+                          <span className="inline-block text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-semibold mt-1">
+                            Admin
+                          </span>
+                        )}
+                      </div>
+                      {isAdmin && (
+                        <Link
+                          to="/admin/profile"
+                          className="block w-full text-center text-gray-600 hover:text-orange-600 hover:bg-gray-50 rounded transition py-2"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          Profile
+                        </Link>
+                      )}
+                      <motion.button
+                        onClick={() => {
+                          setIsOpen(false)
+                          handleLogout()
+                        }}
+                        className="w-full flex items-center justify-center gap-2 text-gray-600 hover:text-red-600 hover:bg-gray-50 rounded transition py-2"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Logout
+                      </motion.button>
+                    </>
+                  )}
                   <motion.button 
                     className="w-full bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition"
                     whileHover={{ scale: 1.02 }}

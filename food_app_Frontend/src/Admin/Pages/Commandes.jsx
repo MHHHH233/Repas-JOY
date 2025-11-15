@@ -385,8 +385,16 @@ export function CommandesPage() {
         title="View Commande Details"
         data={selectedCommande}
         fields={[
-          { key: "user.username", label: "User" },
-          { key: "user.email", label: "User Email" },
+          { 
+            key: "user.username", 
+            label: "User",
+            formatter: (value) => value || "Walk-in customer (No account)"
+          },
+          { 
+            key: "user.email", 
+            label: "User Email",
+            formatter: (value) => value || "-"
+          },
           { key: "repas.name", label: "Repas" },
           { key: "name", label: "Name" },
           { key: "address", label: "Address" },

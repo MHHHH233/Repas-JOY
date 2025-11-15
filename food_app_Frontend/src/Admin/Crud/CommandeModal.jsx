@@ -40,6 +40,13 @@ export function CommandeModal({ isOpen, onClose, onSave, commande = null, users 
         name: selectedUser.username || "",
         address: selectedUser.address || "",
       })
+    } else if (!userId && !commande) {
+      // Clear user selection - allow manual entry
+      setFormData({
+        ...formData,
+        id_user: "",
+        // Keep name and address as they might be manually entered
+      })
     } else {
       setFormData({
         ...formData,
@@ -53,9 +60,7 @@ export function CommandeModal({ isOpen, onClose, onSave, commande = null, users 
     e.preventDefault()
     const newErrors = {}
 
-    if (!formData.id_user) {
-      newErrors.id_user = "User is required"
-    }
+    // User is optional - no validation needed
     if (!formData.id_repas) {
       newErrors.id_repas = "Repas is required"
     }
@@ -71,7 +76,19 @@ export function CommandeModal({ isOpen, onClose, onSave, commande = null, users 
       return
     }
 
-    onSave(formData)
+    // Prepare form data - only include id_user if it's provided
+    const submitData = {
+      id_repas: formData.id_repas,
+      name: formData.name.trim(),
+      address: formData.address.trim(),
+    }
+    
+    // Only include id_user if a user was selected
+    if (formData.id_user) {
+      submitData.id_user = formData.id_user
+    }
+
+    onSave(submitData)
   }
 
   const selectedUser = users.find((u) => u.id === parseInt(formData.id_user))
@@ -92,7 +109,7 @@ export function CommandeModal({ isOpen, onClose, onSave, commande = null, users 
         >
           <label className="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
             <User className="text-orange-600" size={18} />
-            User *
+            User <span className="text-gray-500 text-xs font-normal">(Optional - for walk-in customers)</span>
           </label>
           <select
             value={formData.id_user}
@@ -104,7 +121,7 @@ export function CommandeModal({ isOpen, onClose, onSave, commande = null, users 
             }`}
             disabled={isLoading}
           >
-            <option value="">Select a user</option>
+            <option value="">Select a user (or leave empty for walk-in customer)</option>
             {users.map((user) => (
               <option key={user.id} value={user.id}>
                 {user.username} ({user.email})
@@ -128,7 +145,17 @@ export function CommandeModal({ isOpen, onClose, onSave, commande = null, users 
               className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2"
             >
               <Sparkles className="text-green-600" size={16} />
-              <span className="text-sm text-green-700">User info auto-filled</span>
+              <span className="text-sm text-green-700">User info auto-filled. You can edit name and address if needed.</span>
+            </motion.div>
+          )}
+          {!formData.id_user && !commande && (
+            <motion.div
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center gap-2"
+            >
+              <User className="text-blue-600" size={16} />
+              <span className="text-sm text-blue-700">No user selected. Please enter customer name and address manually.</span>
             </motion.div>
           )}
         </motion.div>

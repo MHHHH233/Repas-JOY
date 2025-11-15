@@ -30,7 +30,7 @@ class CommandeController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'id_user' => 'required|exists:users,id',
+            'id_user' => 'nullable|exists:users,id',
             'id_repas' => 'required|exists:repas,id',
             'address' => 'required|string|max:255',
             'name' => 'required|string|max:255'
@@ -53,7 +53,15 @@ class CommandeController extends Controller
             ], 400);
         }
 
-        $commande = Commande::create($request->all());
+        // Prepare data for creation (handle nullable id_user)
+        $data = $request->only(['id_repas', 'address', 'name']);
+        if ($request->filled('id_user')) {
+            $data['id_user'] = $request->id_user;
+        } else {
+            $data['id_user'] = null;
+        }
+
+        $commande = Commande::create($data);
 
         // Decrease quantity
         $repas->decrement('qte');
@@ -100,7 +108,7 @@ class CommandeController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'id_user' => 'sometimes|exists:users,id',
+            'id_user' => 'nullable|exists:users,id',
             'id_repas' => 'sometimes|exists:repas,id',
             'address' => 'sometimes|string|max:255',
             'name' => 'sometimes|string|max:255'
@@ -114,7 +122,13 @@ class CommandeController extends Controller
             ], 422);
         }
 
-        $commande->update($request->all());
+        // Prepare data for update (handle nullable id_user)
+        $data = $request->only(['id_repas', 'address', 'name']);
+        if ($request->has('id_user')) {
+            $data['id_user'] = $request->id_user ? $request->id_user : null;
+        }
+
+        $commande->update($data);
 
         return response()->json([
             'success' => true,

@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import { CartProvider } from "./context/CartContext"
 import { AccessibilityWrapper } from "./components/AccessibilityWrapper"
-import { ProtectedRoute } from "./components/ProtectedRoute"
+import { ProtectedRoute, AdminProtectedRoute } from "./components/ProtectedRoute"
 import { Navbar } from "./components/Navbar"
 import { Footer } from "./components/Footer"
 import { HomePage } from "./pages/HomePage"
@@ -119,101 +119,101 @@ function App() {
             <Route
               path="/admin"
               element={
-                <ProtectedRoute>
+                <AdminProtectedRoute>
                   <AdminLayout>
                     <Dashboard />
                   </AdminLayout>
-                </ProtectedRoute>
+                </AdminProtectedRoute>
               }
             />
             <Route
               path="/admin/categories"
               element={
-                <ProtectedRoute>
+                <AdminProtectedRoute>
                   <AdminLayout>
                     <CategoriesPage />
                   </AdminLayout>
-                </ProtectedRoute>
+                </AdminProtectedRoute>
               }
             />
             <Route
               path="/admin/sous-categories"
               element={
-                <ProtectedRoute>
+                <AdminProtectedRoute>
                   <AdminLayout>
                     <SousCategoriesPage />
                   </AdminLayout>
-                </ProtectedRoute>
+                </AdminProtectedRoute>
               }
             />
             <Route
               path="/admin/repas"
               element={
-                <ProtectedRoute>
+                <AdminProtectedRoute>
                   <AdminLayout>
                     <RepasPage />
                   </AdminLayout>
-                </ProtectedRoute>
+                </AdminProtectedRoute>
               }
             />
             <Route
               path="/admin/commandes"
               element={
-                <ProtectedRoute>
+                <AdminProtectedRoute>
                   <AdminLayout>
                     <CommandesPage />
                   </AdminLayout>
-                </ProtectedRoute>
+                </AdminProtectedRoute>
               }
             />
             <Route
               path="/admin/users"
               element={
-                <ProtectedRoute>
+                <AdminProtectedRoute>
                   <AdminLayout>
                     <UsersPage />
                   </AdminLayout>
-                </ProtectedRoute>
+                </AdminProtectedRoute>
               }
             />
             <Route
               path="/admin/reviews"
               element={
-                <ProtectedRoute>
+                <AdminProtectedRoute>
                   <AdminLayout>
                     <ReviewsPage />
                   </AdminLayout>
-                </ProtectedRoute>
+                </AdminProtectedRoute>
               }
             />
             <Route
               path="/admin/landing-sections"
               element={
-                <ProtectedRoute>
+                <AdminProtectedRoute>
                   <AdminLayout>
                     <LandingSectionsPage />
                   </AdminLayout>
-                </ProtectedRoute>
+                </AdminProtectedRoute>
               }
             />
             <Route
               path="/admin/social-media"
               element={
-                <ProtectedRoute>
+                <AdminProtectedRoute>
                   <AdminLayout>
                     <SocialMediaPage />
                   </AdminLayout>
-                </ProtectedRoute>
+                </AdminProtectedRoute>
               }
             />
             <Route
               path="/admin/profile"
               element={
-                <ProtectedRoute>
+                <AdminProtectedRoute>
                   <AdminLayout>
                     <ProfilePage />
                   </AdminLayout>
-                </ProtectedRoute>
+                </AdminProtectedRoute>
               }
             />
           </Routes>

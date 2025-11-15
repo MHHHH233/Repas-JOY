@@ -85,6 +85,8 @@ export function SignInPage() {
           }
           
           setSuccessMessage("Login successful! Redirecting...")
+          // Dispatch auth change event to update navbar
+          window.dispatchEvent(new Event("authChange"))
           // Redirect based on user role
           const user = response?.data?.user
           setTimeout(() => {

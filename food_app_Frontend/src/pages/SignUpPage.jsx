@@ -123,6 +123,8 @@ export function SignUpPage() {
         const token = sessionStorage.getItem('token')
         if (token) {
           setSuccessMessage("Account created successfully! Redirecting...")
+          // Dispatch auth change event to update navbar
+          window.dispatchEvent(new Event("authChange"))
           // Redirect to home page after a short delay
           setTimeout(() => {
             navigate("/")
