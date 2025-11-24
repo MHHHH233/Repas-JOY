@@ -22,6 +22,8 @@ import { ReviewsPage } from "./Admin/Pages/Reviews"
 import { LandingSectionsPage } from "./Admin/Pages/LandingSections"
 import { SocialMediaPage } from "./Admin/Pages/Social_Media"
 import { ProfilePage } from "./Admin/Pages/Profile"
+import { About } from "./components/About"
+
 
 function App() {
   return (
@@ -39,6 +41,14 @@ function App() {
                     <HomePage />
                   </main>
                   <Footer />
+                </div>
+              }
+            />
+            <Route
+              path="/About"
+              element={
+                <div >
+                 <About/>
                 </div>
               }
             />

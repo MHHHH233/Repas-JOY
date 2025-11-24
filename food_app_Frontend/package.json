@@ -10,14 +10,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/fiber": "^9.4.0",
     "@tailwindcss/postcss": "^4.1.16",
     "axios": "^1.6.0",
     "framer-motion": "^12.23.24",
+    "gsap": "^3.13.0",
     "lucide-react": "^0.548.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router-dom": "^7.9.4",
-    "recharts": "^3.3.0"
+    "recharts": "^3.3.0",
+    "three": "^0.181.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
