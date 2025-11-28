@@ -9,8 +9,20 @@ export function MenuItemCard({ item }) {
   const [quantity, setQuantity] = useState(1)
   const { addToCart } = useCart()
 
+  // Handle different data structures from API
+  const itemData = {
+    id: item.id,
+    name: item.name || item.nom || "Unnamed Item",
+    description: item.description || item.desc || "",
+    price: parseFloat(item.price || item.prix || 0),
+    image: item.image || item.photo || "/placeholder.svg?height=300&width=300&query=food",
+    rating: item.rating || item.note || "4.5",
+    category: item.category?.name || item.categorie?.name || item.category_name || "Uncategorized",
+    sousCategory: item.sousCategory?.name || item.sous_categorie?.name || item.sous_category_name || "",
+  }
+
   const handleAddToCart = () => {
-    addToCart(item, quantity)
+    addToCart(itemData, quantity)
     setQuantity(1)
   }
 
@@ -32,10 +44,13 @@ export function MenuItemCard({ item }) {
       {/* Image */}
       <div className="aspect-square bg-gray-200 overflow-hidden relative">
         <motion.img
-          src={item.image || "/placeholder.svg?height=300&width=300&query=food"}
-          alt={item.name}
+          src={itemData.image}
+          alt={itemData.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           whileHover={{ scale: 1.1 }}
+          onError={(e) => {
+            e.target.src = "/placeholder.svg?height=300&width=300&query=food"
+          }}
         />
         <motion.div 
           className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1"
@@ -44,7 +59,7 @@ export function MenuItemCard({ item }) {
           transition={{ delay: 0.2 }}
         >
           <Star className="w-4 h-4 fill-orange-400 text-orange-400" />
-          <span className="text-sm font-semibold text-gray-900">{item.rating}</span>
+          <span className="text-sm font-semibold text-gray-900">{itemData.rating}</span>
         </motion.div>
       </div>
 
@@ -53,15 +68,27 @@ export function MenuItemCard({ item }) {
         {/* Name and Rating */}
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-xl font-bold text-gray-900 group-hover:text-orange-600 transition-colors">
-            {item.name}
+            {itemData.name}
           </h3>
         </div>
 
-        {/* Category */}
-        <p className="text-sm text-gray-500 mb-2">{item.category}</p>
+        {/* Category and Sous-Category */}
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-sm text-gray-500">{itemData.category}</span>
+          {itemData.sousCategory && (
+            <>
+              <span className="text-gray-300">•</span>
+              <span className="text-sm text-gray-400">{itemData.sousCategory}</span>
+            </>
+          )}
+        </div>
 
         {/* Description */}
-        <p className="text-gray-600 text-sm mb-4">{item.description}</p>
+        {itemData.description && (
+          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+            {itemData.description}
+          </p>
+        )}
 
         {/* Delivery Info */}
         <div className="flex items-center gap-4 mb-4">
@@ -77,7 +104,9 @@ export function MenuItemCard({ item }) {
 
         {/* Price and Quantity Controls */}
         <div className="flex justify-between items-center mb-4">
-          <span className="text-2xl font-bold text-orange-600">${item.price.toFixed(2)}</span>
+          <span className="text-2xl font-bold text-orange-600">
+            ${itemData.price.toFixed(2)}
+          </span>
           <motion.div 
             className="flex items-center gap-2 bg-gray-100 rounded-lg p-1"
             whileHover={{ scale: 1.05 }}
