@@ -25,6 +25,7 @@ import { LandingSectionsPage } from "./Admin/Pages/LandingSections"
 import { SocialMediaPage } from "./Admin/Pages/Social_Media"
 import { ProfilePage as AdminProfilePage } from "./Admin/Pages/Profile"
 import { ContactPage as AdminContactPage } from "./Admin/Pages/Contacts"
+import { About } from "./components/About"
 
 function App() {
   return (
@@ -255,6 +256,18 @@ function App() {
                     <AdminContactPage />
                   </AdminLayout>
                 </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/about"
+              element={
+                <div className="flex flex-col min-h-screen">
+                  <Navbar />
+                  <main id="main-content" className="flex-1" tabIndex="-1">
+                    <About />
+                  </main>
+                  <Footer />
+                </div>
               }
             />
           </Routes>

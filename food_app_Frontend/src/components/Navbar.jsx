@@ -111,6 +111,9 @@ export function Navbar() {
               <Link to="/alcohol" className="text-gray-600 hover:text-orange-600 transition font-medium">
                 Alcohol
               </Link>
+              <Link to="/about" className="text-gray-600 hover:text-orange-600 transition font-medium">
+                About
+              </Link>
               {isAdmin && (
                 <Link to="/admin" className="text-gray-600 hover:text-orange-600 transition font-medium">
                   Admin
@@ -251,6 +254,13 @@ export function Navbar() {
                   onClick={() => setIsOpen(false)}
                 >
                   Alcohol
+                </Link>
+                <Link
+                  to="/about"
+                  className="block px-4 py-2 text-gray-600 hover:text-orange-600 hover:bg-gray-50 rounded transition"
+                  onClick={() => setIsOpen(false)}
+                >
+                  About
                 </Link>
                 {isAdmin && (
                   <Link
