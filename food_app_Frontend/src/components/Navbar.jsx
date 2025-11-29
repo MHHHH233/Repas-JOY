@@ -182,7 +182,7 @@ export function Navbar() {
 
               {/* User Account Icon - Only show when authenticated */}
               {isAuthenticated && (
-                <Link to={isAdmin ? "/admin/profile" : "#"}>
+                <Link to={isAdmin ? "/admin/profile" : "/profile"}>
                   <button className="p-2 hover:bg-gray-100 rounded-lg transition">
                     <User className="w-5 h-5 text-gray-700" />
                   </button>
@@ -292,15 +292,13 @@ export function Navbar() {
                           </span>
                         )}
                       </div>
-                      {isAdmin && (
-                        <Link
-                          to="/admin/profile"
-                          className="block w-full text-center text-gray-600 hover:text-orange-600 hover:bg-gray-50 rounded transition py-2"
-                          onClick={() => setIsOpen(false)}
-                        >
-                          Profile
-                        </Link>
-                      )}
+                      <Link
+                        to={isAdmin ? "/admin/profile" : "/profile"}
+                        className="block w-full text-center text-gray-600 hover:text-orange-600 hover:bg-gray-50 rounded transition py-2"
+                        onClick={() => setIsOpen(false)}
+                      >
+                        Profile
+                      </Link>
                       <motion.button
                         onClick={() => {
                           setIsOpen(false)

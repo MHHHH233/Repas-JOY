@@ -13,6 +13,7 @@ import {
   ChevronDown,
   ChevronRight,
   UserCircle,
+  MessageSquare,
 } from "lucide-react"
 
 const menuItems = [
@@ -32,6 +33,7 @@ const menuItems = [
   { icon: Star, label: "Reviews", href: "/admin/reviews" },
   { icon: Palette, label: "Landing Sections", href: "/admin/landing-sections" },
   { icon: Share2, label: "Social Media", href: "/admin/social-media" },
+  { icon: MessageSquare, label: "Contacts", href: "/admin/contacts" },
   { icon: UserCircle, label: "Profile", href: "/admin/profile" },
 ]
 

@@ -11,6 +11,8 @@ import { CheckoutPage } from "./pages/CheckoutPage"
 import { OrderConfirmationPage } from "./pages/OrderConfirmationPage"
 import { SignInPage } from "./pages/SignInPage"
 import { SignUpPage } from "./pages/SignUpPage"
+import { ContactPage } from "./pages/ContactPage"
+import { ProfilePage } from "./pages/ProfilePage"
 import AdminLayout from "./Admin/Layouts"
 import { Dashboard } from "./Admin/Pages/Dashboard"
 import { UsersPage } from "./Admin/Pages/Users"
@@ -21,7 +23,8 @@ import { CommandesPage } from "./Admin/Pages/Commandes"
 import { ReviewsPage } from "./Admin/Pages/Reviews"
 import { LandingSectionsPage } from "./Admin/Pages/LandingSections"
 import { SocialMediaPage } from "./Admin/Pages/Social_Media"
-import { ProfilePage } from "./Admin/Pages/Profile"
+import { ProfilePage as AdminProfilePage } from "./Admin/Pages/Profile"
+import { ContactPage as AdminContactPage } from "./Admin/Pages/Contacts"
 
 function App() {
   return (
@@ -112,6 +115,34 @@ function App() {
                   </main>
                   <Footer />
                 </div>
+              }
+            />
+            <Route
+              path="/contact"
+              element={
+                <div className="flex flex-col min-h-screen">
+                  <Navbar />
+                  <main id="main-content" className="flex-1" tabIndex="-1">
+                    <ContactPage />
+                  </main>
+                  <Footer />
+                </div>
+              }
+            />
+
+            {/* Protected User Routes */}
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <div className="flex flex-col min-h-screen">
+                    <Navbar />
+                    <main id="main-content" className="flex-1" tabIndex="-1">
+                      <ProfilePage />
+                    </main>
+                    <Footer />
+                  </div>
+                </ProtectedRoute>
               }
             />
 
@@ -211,7 +242,17 @@ function App() {
               element={
                 <AdminProtectedRoute>
                   <AdminLayout>
-                    <ProfilePage />
+                    <AdminProfilePage />
+                  </AdminLayout>
+                </AdminProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/contacts"
+              element={
+                <AdminProtectedRoute>
+                  <AdminLayout>
+                    <AdminContactPage />
                   </AdminLayout>
                 </AdminProtectedRoute>
               }

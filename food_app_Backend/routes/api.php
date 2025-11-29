@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthenticationController;
+use App\Http\Controllers\User\ContactController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +19,9 @@ use App\Http\Controllers\AuthenticationController;
 // Public authentication routes
 Route::post('register', [AuthenticationController::class, 'register']);
 Route::post('login', [AuthenticationController::class, 'login']);
+
+// Public contact route (no authentication required)
+Route::post('contact', [ContactController::class, 'store']);
 
 // Protected authentication routes
 Route::middleware('auth:sanctum')->group(function () {

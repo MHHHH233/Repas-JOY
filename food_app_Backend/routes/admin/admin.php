@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\AdminReviewController;
 use App\Http\Controllers\Admin\AdminLandingSectionController;
 use App\Http\Controllers\Admin\AdminSousCategoryController;
 use App\Http\Controllers\Admin\AdminSocialMediaController;
+use App\Http\Controllers\Admin\AdminContactController;
+use App\Http\Controllers\Admin\AdminBannerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -101,6 +103,28 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/{id}', [AdminSocialMediaController::class, 'update']);
         Route::delete('/{id}', [AdminSocialMediaController::class, 'destroy']);
         Route::get('/stats/overview', [AdminSocialMediaController::class, 'getStats']);
+    });
+
+    // Admin Contact routes
+    Route::prefix('admin/contacts')->group(function () {
+        Route::get('/', [AdminContactController::class, 'index']);
+        Route::post('/', [AdminContactController::class, 'store']);
+        Route::get('/{id}', [AdminContactController::class, 'show']);
+        Route::put('/{id}', [AdminContactController::class, 'update']);
+        Route::delete('/{id}', [AdminContactController::class, 'destroy']);
+        Route::put('/{id}/status', [AdminContactController::class, 'updateStatus']);
+        Route::get('/stats/overview', [AdminContactController::class, 'getStats']);
+    });
+
+    // Admin Banner routes
+    Route::prefix('admin/banners')->group(function () {
+        Route::get('/', [AdminBannerController::class, 'index']);
+        Route::post('/', [AdminBannerController::class, 'store']);
+        Route::get('/{id}', [AdminBannerController::class, 'show']);
+        Route::put('/{id}', [AdminBannerController::class, 'update']);
+        Route::delete('/{id}', [AdminBannerController::class, 'destroy']);
+        Route::put('/{id}/status', [AdminBannerController::class, 'updateStatus']);
+        Route::get('/stats/overview', [AdminBannerController::class, 'getStats']);
     });
 
     // Admin Dashboard routes
